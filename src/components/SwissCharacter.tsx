@@ -33,9 +33,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for display - middle size between too big and too small
+          // Scale and position - moved much further left to not block heading
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-3, -4.5, 0);
+          vrm.scene.position.set(-7, -4.5, 0); // MOVED from -3 to -7 (much further left)
           // Slight left turn for better 3D effect (about 30 degrees)
           vrm.scene.rotation.y = Math.PI + Math.PI * 0.17;
           
@@ -75,91 +75,42 @@ const SwissVRM = () => {
           
           console.log('Now attempting animation...');
           
-          // Now try different animations - starting with happy
+          // Now try the look animation directly (user requested)
           try {
             const animationLoader = new GLTFLoader();
-            console.log('Trying happy.glb animation...');
+            console.log('Loading look.glb animation directly...');
             const animationGltf = await animationLoader.loadAsync(
-              'https://raw.githubusercontent.com/ferazzeid/vrm/main/happy.glb'
+              'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
             );
             
-            console.log('Happy animation GLB loaded:', animationGltf);
-            console.log('Happy animation count:', animationGltf.animations?.length || 0);
-            console.log('Happy animations:', animationGltf.animations);
+            console.log('Look animation GLB loaded:', animationGltf);
+            console.log('Look animation count:', animationGltf.animations?.length || 0);
+            console.log('Look animations:', animationGltf.animations);
             
             if (animationGltf.animations && animationGltf.animations.length > 0) {
               console.log('Creating animation mixer...');
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
-              
-              // Try to apply happy animation directly
+              // Try to apply look animation directly
               try {
-                console.log('Trying happy animation...');
+                console.log('Trying look animation...');
                 const action = mixer.clipAction(animationGltf.animations[0]);
                 action.setLoop(THREE.LoopRepeat, Infinity);
                 action.clampWhenFinished = false;
                 action.weight = 1;
                 action.play();
                 
-                console.log('✅ Happy animation applied successfully!');
-                console.log('Happy animation duration:', animationGltf.animations[0].duration);
+                console.log('✅ Look animation applied successfully!');
+                console.log('Look animation duration:', animationGltf.animations[0].duration);
               } catch (directError) {
-                console.log('Happy animation failed, trying look animation...');
-                console.log('Happy error:', directError.message);
-                
-                // Try look animation as fallback
-                try {
-                  const lookLoader = new GLTFLoader();
-                  console.log('Loading look.glb animation...');
-                  const lookGltf = await lookLoader.loadAsync(
-                    'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
-                  );
-                  
-                  if (lookGltf.animations && lookGltf.animations.length > 0) {
-                    const lookAction = mixer.clipAction(lookGltf.animations[0]);
-                    lookAction.setLoop(THREE.LoopRepeat, Infinity);
-                    lookAction.clampWhenFinished = false;
-                    lookAction.weight = 1;
-                    lookAction.play();
-                    
-                    console.log('✅ Look animation applied successfully!');
-                  } else {
-                    throw new Error('No animations in look.glb');
-                  }
-                } catch (lookError) {
-                  console.log('Look animation also failed, using manual pose');
-                  console.log('Look error:', lookError.message);
-                  // Disable mixer since animations failed
-                  mixerRef.current = null;
-                }
-              }
-            } else {
-              console.warn('❌ No animations found in happy.glb - trying look.glb...');
-              
-              // Create mixer for backup animation
-              const mixer = new THREE.AnimationMixer(vrm.scene);
-              mixerRef.current = mixer;
-              
-              // Try look animation as backup
-              try {
-                const lookLoader = new GLTFLoader();
-                const lookGltf = await lookLoader.loadAsync(
-                  'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
-                );
-                
-                if (lookGltf.animations && lookGltf.animations.length > 0) {
-                  const lookAction = mixer.clipAction(lookGltf.animations[0]);
-                  lookAction.setLoop(THREE.LoopRepeat, Infinity);
-                  lookAction.play();
-                  console.log('✅ Look animation loaded as backup!');
-                } else {
-                  console.warn('No animations in look.glb either');
-                  mixerRef.current = null;
-                }
-              } catch (lookError) {
-                console.warn('Look animation backup failed:', lookError);
+                console.log('Look animation failed, using manual pose...');
+                console.log('Look error:', directError.message);
+                // Disable mixer since animation failed
                 mixerRef.current = null;
               }
+            } else {
+              console.warn('❌ No animations found in look.glb - using manual pose');
+              mixerRef.current = null;
             }
           } catch (animError) {
             console.error('❌ Failed to load any animations:', animError);
@@ -426,7 +377,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={20} // Increased maximum distance  
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-4, 0, 0]} // Adjusted target for left positioning
+              target={[-7, 0, 0]} // UPDATED target to match new avatar position (-7)
             />
           </Canvas>
         </div>
