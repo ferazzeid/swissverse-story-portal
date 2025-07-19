@@ -46,97 +46,97 @@ const SwissVRM = () => {
           
           console.log('Now attempting animation...');
           
-          // Now load the idle animation
+          // Now try different animations - starting with happy
           try {
             const animationLoader = new GLTFLoader();
-            console.log('Loading idle.glb animation...');
+            console.log('Trying happy.glb animation...');
             const animationGltf = await animationLoader.loadAsync(
-              'https://raw.githubusercontent.com/ferazzeid/vrm/main/idle.glb'
+              'https://raw.githubusercontent.com/ferazzeid/vrm/main/happy.glb'
             );
             
-            console.log('Animation GLB loaded:', animationGltf);
-            console.log('Animation count:', animationGltf.animations?.length || 0);
-            console.log('Animations:', animationGltf.animations);
+            console.log('Happy animation GLB loaded:', animationGltf);
+            console.log('Happy animation count:', animationGltf.animations?.length || 0);
+            console.log('Happy animations:', animationGltf.animations);
             
             if (animationGltf.animations && animationGltf.animations.length > 0) {
               console.log('Creating animation mixer...');
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
               
-              // Simplified approach - try to apply animation directly first
+              // Try to apply happy animation directly
               try {
-                console.log('Trying direct animation application...');
+                console.log('Trying happy animation...');
                 const action = mixer.clipAction(animationGltf.animations[0]);
                 action.setLoop(THREE.LoopRepeat, Infinity);
                 action.clampWhenFinished = false;
                 action.weight = 1;
                 action.play();
                 
-                console.log('✅ Direct animation application successful!');
+                console.log('✅ Happy animation applied successfully!');
+                console.log('Happy animation duration:', animationGltf.animations[0].duration);
               } catch (directError) {
-                console.log('Direct application failed, trying bone retargeting...');
-                console.log('Direct error:', directError.message);
+                console.log('Happy animation failed, trying look animation...');
+                console.log('Happy error:', directError.message);
                 
-                // Fallback: Try to find and map the bones manually
+                // Try look animation as fallback
                 try {
-                  const humanoid = vrm.humanoid;
-                  if (humanoid) {
-                    console.log('Found VRM humanoid, applying manual animation...');
+                  const lookLoader = new GLTFLoader();
+                  console.log('Loading look.glb animation...');
+                  const lookGltf = await lookLoader.loadAsync(
+                    'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
+                  );
+                  
+                  if (lookGltf.animations && lookGltf.animations.length > 0) {
+                    const lookAction = mixer.clipAction(lookGltf.animations[0]);
+                    lookAction.setLoop(THREE.LoopRepeat, Infinity);
+                    lookAction.clampWhenFinished = false;
+                    lookAction.weight = 1;
+                    lookAction.play();
                     
-                    // Apply a simple idle animation manually
-                    const applyIdleAnimation = () => {
-                      const time = Date.now() * 0.001;
-                      
-                      // Breathing motion
-                      const spine = humanoid.getBoneNode(VRMHumanBoneName.Spine);
-                      if (spine) {
-                        spine.rotation.x = Math.sin(time * 2) * 0.02;
-                      }
-                      
-                      // Subtle head movement
-                      const head = humanoid.getBoneNode(VRMHumanBoneName.Head);
-                      if (head) {
-                        head.rotation.y = Math.sin(time * 0.8) * 0.05;
-                        head.rotation.x = Math.sin(time * 1.2) * 0.02;
-                      }
-                      
-                      // Arm positioning - natural idle pose
-                      const leftUpperArm = humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-                      const rightUpperArm = humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
-                      
-                      if (leftUpperArm) {
-                        leftUpperArm.rotation.set(0.1, 0, -0.3 + Math.sin(time * 1.5) * 0.05);
-                      }
-                      if (rightUpperArm) {
-                        rightUpperArm.rotation.set(0.1, 0, 0.3 + Math.sin(time * 1.5 + Math.PI) * 0.05);
-                      }
-                    };
-                    
-                    // Store the animation function to be called in useFrame
-                    (vrm as any).customIdleAnimation = applyIdleAnimation;
-                    console.log('✅ Custom idle animation set up successfully!');
+                    console.log('✅ Look animation applied successfully!');
                   } else {
-                    console.warn('No humanoid found, using basic manual pose');
-                    setManualPose(vrm);
+                    throw new Error('No animations in look.glb');
                   }
-                } catch (manualError) {
-                  console.warn('Manual animation failed:', manualError);
-                  setManualPose(vrm);
+                } catch (lookError) {
+                  console.log('Look animation also failed, using manual pose');
+                  console.log('Look error:', lookError.message);
+                  // Disable mixer since animations failed
+                  mixerRef.current = null;
                 }
-                
-                // Disable mixer since we're using manual animation
-                mixerRef.current = null;
               }
             } else {
-              console.warn('❌ No animations found in idle.glb - using manual pose');
-              setManualPose(vrm);
+              console.warn('❌ No animations found in happy.glb - trying look.glb...');
+              
+              // Create mixer for backup animation
+              const mixer = new THREE.AnimationMixer(vrm.scene);
+              mixerRef.current = mixer;
+              
+              // Try look animation as backup
+              try {
+                const lookLoader = new GLTFLoader();
+                const lookGltf = await lookLoader.loadAsync(
+                  'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
+                );
+                
+                if (lookGltf.animations && lookGltf.animations.length > 0) {
+                  const lookAction = mixer.clipAction(lookGltf.animations[0]);
+                  lookAction.setLoop(THREE.LoopRepeat, Infinity);
+                  lookAction.play();
+                  console.log('✅ Look animation loaded as backup!');
+                } else {
+                  console.warn('No animations in look.glb either');
+                  mixerRef.current = null;
+                }
+              } catch (lookError) {
+                console.warn('Look animation backup failed:', lookError);
+                mixerRef.current = null;
+              }
             }
           } catch (animError) {
-            console.error('❌ Failed to load idle animation:', animError);
+            console.error('❌ Failed to load any animations:', animError);
             console.error('Animation error details:', animError.message);
-            // Fallback to manual pose if animation fails
-            console.log('Falling back to manual pose...');
-            setManualPose(vrm);
+            console.log('Using manual pose only...');
+            mixerRef.current = null;
           }
           
           setVrm(vrm);
