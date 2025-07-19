@@ -3,6 +3,7 @@ import { StorySection } from "@/components/StorySection";
 import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
+import { SwissCharacter } from "@/components/SwissCharacter";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <ProjectsShowcase />
       <ResourcesGrid />
       <Footer />
+      <SwissCharacter />
     </div>
   );
 };
