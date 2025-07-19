@@ -33,9 +33,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position - positioned for left-center visibility
+          // Scale and position - positioned left of center in 3D space
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-2, -4.5, 0); // Moved closer to center from -5
+          vrm.scene.position.set(-4, -4.5, 0); // Much further left in 3D space
           // Start facing forward - rotation will be animated
           vrm.scene.rotation.y = 0;
           
@@ -387,7 +387,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={16}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[0, 0, 0]} // Center the avatar in this left canvas area
+              target={[-4, 0, 0]} // Follow the avatar's left position
             />
           </Canvas>
         </div>
