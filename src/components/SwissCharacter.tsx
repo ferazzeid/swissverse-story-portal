@@ -187,10 +187,10 @@ const SwissVRM = () => {
                 
                 if (leftUpperArm && rightUpperArm) {
                   console.log('Using NORMALIZED bone nodes...');
-                  // ADJUSTED: More natural hanging arm rotations
-                  leftUpperArm.rotation.set(0.1, 0, 0.3);  // Slight forward lean + gentle outward for left
-                  rightUpperArm.rotation.set(0.1, 0, -0.3); // Slight forward lean + gentle outward for right
-                  console.log('Normalized bones set to natural hanging position');
+                  // CORRECTED: Bring arms CLOSER to body (reversed Z values)
+                  leftUpperArm.rotation.set(0.1, 0, -0.1);  // Negative Z brings left arm closer to body
+                  rightUpperArm.rotation.set(0.1, 0, 0.1);  // Positive Z brings right arm closer to body
+                  console.log('Normalized bones set to hang close to body');
                 } else {
                   console.log('Normalized bones not found, trying direct scene manipulation...');
                   
@@ -199,10 +199,10 @@ const SwissVRM = () => {
                     if (child.name.includes('UpperArm') || child.name.includes('upperarm')) {
                       console.log('Found upper arm in scene:', child.name);
                       if (child.name.includes('L_') || child.name.includes('Left')) {
-                        child.rotation.set(0.1, 0, 0.3);  // ADJUSTED: Natural left arm hang
+                        child.rotation.set(0.1, 0, -0.1);  // CORRECTED: Bring left arm closer to body
                         child.matrixAutoUpdate = false;
                       } else if (child.name.includes('R_') || child.name.includes('Right')) {
-                        child.rotation.set(0.1, 0, -0.3); // ADJUSTED: Natural right arm hang
+                        child.rotation.set(0.1, 0, 0.1);   // CORRECTED: Bring right arm closer to body
                         child.matrixAutoUpdate = false;
                       }
                     }
