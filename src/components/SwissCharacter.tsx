@@ -48,7 +48,7 @@ const SwissVRM = () => {
           if (vrm.humanoid) {
             console.log('Humanoid bones available:');
             Object.values(VRMHumanBoneName).forEach(boneName => {
-              const bone = vrm.humanoid?.getBoneNode(boneName);
+              const bone = vrm.humanoid?.getRawBoneNode(boneName); // FIXED: Using getRawBoneNode
               if (bone) {
                 console.log(`✅ ${boneName}:`, bone.name, 'rotation:', bone.rotation);
               } else {
@@ -202,7 +202,7 @@ const SwissVRM = () => {
       armBones.forEach(({ name, side, type }) => {
         totalAttempts++;
         try {
-          const bone = vrm.humanoid!.getBoneNode(name);
+          const bone = vrm.humanoid!.getRawBoneNode(name); // FIXED: Using getRawBoneNode
           if (bone) {
             console.log(`✅ Found ${side} ${type} arm bone:`, bone.name);
             
@@ -265,8 +265,8 @@ const SwissVRM = () => {
       if (Math.floor(time) % 5 === 0 && Math.floor(time * 10) % 10 === 0) {
         console.log('🔍 Periodic pose check at', Math.floor(time), 'seconds');
         if (vrmRef.current.humanoid) {
-          const leftArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-          const rightArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+          const leftArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm); // FIXED
+          const rightArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm); // FIXED
           if (leftArm) console.log('Left arm rotation:', leftArm.rotation);
           if (rightArm) console.log('Right arm rotation:', rightArm.rotation);
         }
@@ -290,7 +290,7 @@ const SwissVRM = () => {
         
         if (vrmRef.current.humanoid) {
           // Natural head movement - looking around occasionally
-          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head); // FIXED
           if (head) {
             head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.05;
             head.rotation.x = Math.sin(time * 0.7) * 0.01;
