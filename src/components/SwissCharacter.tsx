@@ -35,9 +35,9 @@ const SwissVRM = () => {
         if (vrm) {
           // Scale and position - moved much further left to not block heading
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-8, -4.5, 0); // MOVED further left to -8
-          // Face the user with slight angle (30 degrees right turn, not away)
-          vrm.scene.rotation.y = Math.PI * 0.17;
+          vrm.scene.position.set(-5, -4.5, 0); // Reset to reasonable left position
+          // Start facing forward - rotation will be animated
+          vrm.scene.rotation.y = 0;
           
           console.log('VRM loaded successfully');
           
@@ -290,6 +290,11 @@ const SwissVRM = () => {
         // Use custom idle animation if available
         (vrmRef.current as any).customIdleAnimation();
       } else {
+        // 360-degree slow rotation animation
+        if (vrmRef.current) {
+          vrmRef.current.scene.rotation.y = time * 0.2; // Slow 360-degree rotation
+        }
+        
         // Fallback to basic manual animations
         // Breathing animation - more pronounced
         const breathingIntensity = Math.sin(time * 1.2) * 0.05;
@@ -354,9 +359,10 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
         className="absolute inset-0 z-0 pointer-events-none select-none"
         style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
       >
-        <div className="absolute left-0 top-0 w-full h-full pointer-events-auto">
+        {/* Position canvas to show avatar on left side */}
+        <div className="absolute left-0 top-0 w-1/2 h-full pointer-events-auto">
           <Canvas
-            camera={{ position: [-5, 2, 15], fov: 45 }} // Much further back
+            camera={{ position: [0, 2, 12], fov: 45 }} // Camera looking straight ahead
             style={{ 
               background: 'transparent', 
               width: '100%', 
@@ -377,11 +383,11 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
-              minDistance={12} // Increased minimum distance
-              maxDistance={20} // Increased maximum distance  
+              minDistance={8}
+              maxDistance={16}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-8, 0, 0]} // UPDATED target to match new avatar position (-8)
+              target={[0, 0, 0]} // Center the avatar in this left canvas area
             />
           </Canvas>
         </div>
