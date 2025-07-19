@@ -290,26 +290,28 @@ const SwissVRM = () => {
         // Use custom idle animation if available
         (vrmRef.current as any).customIdleAnimation();
       } else {
-        // 360-degree slow rotation animation starting from -120 degrees (240 degrees)
+        // 360-degree slow clockwise rotation animation with breathing
         if (vrmRef.current) {
-          vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Start from -120 degrees + rotation
+          vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Clockwise rotation from 240 degrees
         }
         
-        // Fallback to basic manual animations
-        // Breathing animation - more pronounced
-        const breathingIntensity = Math.sin(time * 1.2) * 0.05;
-        groupRef.current.position.y = breathingIntensity;
+        // Breathing/pulsating animation - scale and position
+        const breathingIntensity = Math.sin(time * 1.5) * 0.08; // Slightly stronger breathing
+        const breathingScale = 1 + Math.sin(time * 1.5) * 0.02; // Subtle scale pulsing
+        
+        groupRef.current.position.y = breathingIntensity; // Up and down movement
+        groupRef.current.scale.setScalar(breathingScale); // Subtle size pulsing
         
         // Weight shifting from leg to leg (slower cycle)
-        const weightShift = Math.sin(time * 0.4) * 0.02;
+        const weightShift = Math.sin(time * 0.4) * 0.015;
         groupRef.current.rotation.z = weightShift;
         
         if (vrmRef.current.humanoid) {
           // Natural head movement - looking around occasionally
-          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head); // FIXED
+          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
           if (head) {
-            head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.05;
-            head.rotation.x = Math.sin(time * 0.7) * 0.01;
+            head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
+            head.rotation.x = Math.sin(time * 0.7) * 0.015;
           }
         }
       }
