@@ -35,8 +35,8 @@ const SwissVRM = () => {
           // Scale and position for display - much bigger for interaction
           vrm.scene.scale.setScalar(6);
           vrm.scene.position.set(-3, -4, 0);
-          // Rotate to face forward (180 degrees from back view)
-          vrm.scene.rotation.y = Math.PI;
+          // Slight left turn for better 3D effect (about 30 degrees)
+          vrm.scene.rotation.y = Math.PI + Math.PI * 0.17;
           
           console.log('VRM loaded successfully, now loading animation...');
           
@@ -53,27 +53,80 @@ const SwissVRM = () => {
             console.log('Animations:', animationGltf.animations);
             
             if (animationGltf.animations && animationGltf.animations.length > 0) {
-              // Create animation mixer
               console.log('Creating animation mixer...');
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
               
-              // Try to apply the animation, but handle bone mismatches
+              // Clone and retarget the animation for VRM compatibility
+              const originalClip = animationGltf.animations[0];
+              console.log('Original animation tracks:', originalClip.tracks.length);
+              
+              // Create new tracks that map mixamorig bones to VRM bones
+              const newTracks: THREE.KeyframeTrack[] = [];
+              
+              originalClip.tracks.forEach((track) => {
+                const trackName = track.name;
+                console.log('Processing track:', trackName);
+                
+                // Map mixamorig bone names to VRM bone names
+                let newTrackName = trackName;
+                
+                // Replace mixamorig prefix with the actual bone structure
+                if (trackName.includes('mixamorigHips')) {
+                  newTrackName = trackName.replace('mixamorigHips', 'Hips');
+                } else if (trackName.includes('mixamorigSpine')) {
+                  newTrackName = trackName.replace('mixamorigSpine', 'Spine');
+                } else if (trackName.includes('mixamorigLeftUpperArm')) {
+                  newTrackName = trackName.replace('mixamorigLeftUpperArm', 'LeftUpperArm');
+                } else if (trackName.includes('mixamorigRightUpperArm')) {
+                  newTrackName = trackName.replace('mixamorigRightUpperArm', 'RightUpperArm');
+                } else if (trackName.includes('mixamorigLeftLowerArm')) {
+                  newTrackName = trackName.replace('mixamorigLeftLowerArm', 'LeftLowerArm');
+                } else if (trackName.includes('mixamorigRightLowerArm')) {
+                  newTrackName = trackName.replace('mixamorigRightLowerArm', 'RightLowerArm');
+                } else if (trackName.includes('mixamorigLeftHand')) {
+                  newTrackName = trackName.replace('mixamorigLeftHand', 'LeftHand');
+                } else if (trackName.includes('mixamorigRightHand')) {
+                  newTrackName = trackName.replace('mixamorigRightHand', 'RightHand');
+                } else if (trackName.includes('mixamorigHead')) {
+                  newTrackName = trackName.replace('mixamorigHead', 'Head');
+                } else if (trackName.includes('mixamorigNeck')) {
+                  newTrackName = trackName.replace('mixamorigNeck', 'Neck');
+                }
+                
+                // Skip finger tracks that are causing errors
+                if (!trackName.includes('Thumb') && !trackName.includes('Index') && 
+                    !trackName.includes('Middle') && !trackName.includes('Ring') && 
+                    !trackName.includes('Pinky')) {
+                  
+                  // Create new track with corrected name
+                  if (track instanceof THREE.QuaternionKeyframeTrack) {
+                    newTracks.push(new THREE.QuaternionKeyframeTrack(newTrackName, track.times, track.values));
+                  } else if (track instanceof THREE.VectorKeyframeTrack) {
+                    newTracks.push(new THREE.VectorKeyframeTrack(newTrackName, track.times, track.values));
+                  } else if (track instanceof THREE.NumberKeyframeTrack) {
+                    newTracks.push(new THREE.NumberKeyframeTrack(newTrackName, track.times, track.values));
+                  }
+                }
+              });
+              
+              console.log('New tracks created:', newTracks.length);
+              
+              // Create new animation clip with retargeted tracks
+              const retargetedClip = new THREE.AnimationClip(originalClip.name + '_retargeted', originalClip.duration, newTracks);
+              
               try {
-                console.log('Creating and playing animation action...');
-                const action = mixer.clipAction(animationGltf.animations[0]);
+                const action = mixer.clipAction(retargetedClip);
                 action.setLoop(THREE.LoopRepeat, Infinity);
                 action.clampWhenFinished = false;
                 action.play();
                 
-                console.log('✅ Animation started successfully!');
-                console.log('Animation duration:', animationGltf.animations[0].duration);
-                console.log('Animation name:', animationGltf.animations[0].name);
+                console.log('✅ Retargeted animation playing successfully!');
               } catch (animPlayError) {
-                console.warn('❌ Animation incompatible with VRM bones - using manual pose');
+                console.warn('❌ Retargeted animation failed - using manual pose');
                 console.warn('Animation error:', animPlayError);
                 setManualPose(vrm);
-                mixerRef.current = null; // Disable mixer since animation failed
+                mixerRef.current = null;
               }
             } else {
               console.warn('❌ No animations found in idle.glb - using manual pose');
