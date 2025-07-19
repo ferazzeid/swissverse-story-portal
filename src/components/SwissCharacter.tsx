@@ -171,22 +171,51 @@ const SwissVRM = () => {
           setVrm(vrm);
           vrmRef.current = vrm;
           
-          // FORCE T-pose fix AFTER everything is set up - with persistence
-          console.log('🔧 FINAL T-POSE FIX ATTEMPT...');
+          // FORCE T-pose fix AFTER everything is set up - NEW APPROACH
+          console.log('🔧 TRYING VRM POSE OVERRIDE APPROACH...');
           setTimeout(() => {
-            const finalResult = setManualPose(vrm);
-            console.log('Final T-pose fix result:', finalResult);
-            
-            // Double-check after another delay
-            setTimeout(() => {
-              if (vrm.humanoid) {
-                const leftCheck = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
-                const rightCheck = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
-                console.log('FINAL CHECK - Left arm:', leftCheck?.rotation);
-                console.log('FINAL CHECK - Right arm:', rightCheck?.rotation);
+            // Try completely different approach - override the humanoid pose directly
+            if (vrm.humanoid) {
+              try {
+                // Method 1: Try to set a rest pose
+                console.log('Attempting to set VRM rest pose...');
+                const humanoid = vrm.humanoid;
+                
+                // Get the normalized bone nodes (these should respect VRM standards)
+                const leftUpperArm = humanoid.getNormalizedBoneNode(VRMHumanBoneName.LeftUpperArm);
+                const rightUpperArm = humanoid.getNormalizedBoneNode(VRMHumanBoneName.RightUpperArm);
+                
+                if (leftUpperArm && rightUpperArm) {
+                  console.log('Using NORMALIZED bone nodes...');
+                  leftUpperArm.rotation.set(0, 0, -1.5);
+                  rightUpperArm.rotation.set(0, 0, 1.5);
+                  console.log('Normalized bones set');
+                } else {
+                  console.log('Normalized bones not found, trying direct scene manipulation...');
+                  
+                  // Method 2: Find bones in the scene directly and LOCK them
+                  vrm.scene.traverse((child) => {
+                    if (child.name.includes('UpperArm') || child.name.includes('upperarm')) {
+                      console.log('Found upper arm in scene:', child.name);
+                      if (child.name.includes('L_') || child.name.includes('Left')) {
+                        child.rotation.set(0, 0, -1.5);
+                        child.matrixAutoUpdate = false; // Lock it
+                      } else if (child.name.includes('R_') || child.name.includes('Right')) {
+                        child.rotation.set(0, 0, 1.5);
+                        child.matrixAutoUpdate = false; // Lock it
+                      }
+                    }
+                  });
+                }
+                
+                // Force a complete VRM update
+                vrm.update(0.016);
+                
+              } catch (error) {
+                console.error('VRM pose override failed:', error);
               }
-            }, 500);
-          }, 200);
+            }
+          }, 300);
         }
       } catch (err) {
         console.error('Failed to load VRM:', err);
