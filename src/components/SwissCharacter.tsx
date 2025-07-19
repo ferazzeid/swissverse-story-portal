@@ -187,10 +187,10 @@ const SwissVRM = () => {
                 
                 if (leftUpperArm && rightUpperArm) {
                   console.log('Using NORMALIZED bone nodes...');
-                  // CORRECTED: Bring arms CLOSER to body (reversed Z values)
-                  leftUpperArm.rotation.set(0.1, 0, -0.1);  // Negative Z brings left arm closer to body
-                  rightUpperArm.rotation.set(0.1, 0, 0.1);  // Positive Z brings right arm closer to body
-                  console.log('Normalized bones set to hang close to body');
+                  // BACK TO WORKING DIRECTION: Larger values that move away from T-pose
+                  leftUpperArm.rotation.set(0.2, 0, 0.5);  // Back to positive for left (away from T-pose)
+                  rightUpperArm.rotation.set(0.2, 0, -0.5); // Back to negative for right (away from T-pose)
+                  console.log('Normalized bones set away from T-pose');
                 } else {
                   console.log('Normalized bones not found, trying direct scene manipulation...');
                   
@@ -199,10 +199,10 @@ const SwissVRM = () => {
                     if (child.name.includes('UpperArm') || child.name.includes('upperarm')) {
                       console.log('Found upper arm in scene:', child.name);
                       if (child.name.includes('L_') || child.name.includes('Left')) {
-                        child.rotation.set(0.1, 0, -0.1);  // CORRECTED: Bring left arm closer to body
+                        child.rotation.set(0.2, 0, 0.5);   // BACK TO: Move left arm away from T-pose
                         child.matrixAutoUpdate = false;
                       } else if (child.name.includes('R_') || child.name.includes('Right')) {
-                        child.rotation.set(0.1, 0, 0.1);   // CORRECTED: Bring right arm closer to body
+                        child.rotation.set(0.2, 0, -0.5);  // BACK TO: Move right arm away from T-pose
                         child.matrixAutoUpdate = false;
                       }
                     }
