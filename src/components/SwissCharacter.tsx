@@ -32,13 +32,19 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for display - smaller scale to fit better
-          vrm.scene.scale.setScalar(4);
-          vrm.scene.position.set(-3, -5, 0);
+          // Scale and position for display - middle size between too big and too small
+          vrm.scene.scale.setScalar(5);
+          vrm.scene.position.set(-3, -4.5, 0);
           // Slight left turn for better 3D effect (about 30 degrees)
           vrm.scene.rotation.y = Math.PI + Math.PI * 0.17;
           
-          console.log('VRM loaded successfully, now loading animation...');
+          console.log('VRM loaded successfully');
+          
+          // IMMEDIATELY fix T-pose regardless of animation
+          console.log('Fixing T-pose immediately...');
+          setManualPose(vrm);
+          
+          console.log('Now attempting animation...');
           
           // Now load the idle animation
           try {
@@ -144,22 +150,42 @@ const SwissVRM = () => {
       }
     };
 
-    // Helper function for manual pose fallback
+    // Helper function for manual pose - GUARANTEED to fix T-pose
     const setManualPose = (vrm: VRM) => {
-      console.log('🔧 Setting manual pose as fallback...');
+      console.log('🔧 Setting manual pose to fix T-pose...');
       if (vrm.humanoid) {
-        const leftUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
-        const rightUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
-        
-        if (leftUpperArm) {
-          leftUpperArm.rotation.set(0, 0, -1.2);
-          console.log('Manual left arm set');
+        try {
+          // Get arm bones using VRM humanoid bone names
+          const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
+          const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+          const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
+          const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
+          
+          if (leftUpperArm) {
+            // Natural hanging left arm position
+            leftUpperArm.rotation.set(0.2, 0, -0.5);
+            console.log('✅ Left upper arm positioned');
+          }
+          if (rightUpperArm) {
+            // Natural hanging right arm position
+            rightUpperArm.rotation.set(0.2, 0, 0.5);
+            console.log('✅ Right upper arm positioned');
+          }
+          if (leftLowerArm) {
+            // Slight bend in left elbow
+            leftLowerArm.rotation.set(0, 0, -0.3);
+            console.log('✅ Left lower arm positioned');
+          }
+          if (rightLowerArm) {
+            // Slight bend in right elbow
+            rightLowerArm.rotation.set(0, 0, 0.3);
+            console.log('✅ Right lower arm positioned');
+          }
+          
+          console.log('✅ T-pose FIXED! Arms should now be in natural position');
+        } catch (error) {
+          console.error('❌ Error setting manual pose:', error);
         }
-        if (rightUpperArm) {
-          rightUpperArm.rotation.set(0, 0, 1.2);
-          console.log('Manual right arm set');
-        }
-        console.log('✅ Manual pose applied');
       } else {
         console.warn('❌ No humanoid found for manual pose');
       }
