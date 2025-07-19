@@ -51,14 +51,19 @@ export const HeroSection = () => {
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
           <span className="text-gradient">Welcome to the</span>{" "}
-          <span className="text-white uppercase">SWISSVERSE</span>
+          <span className="relative text-white uppercase">
+            SWISSVERSE
+            {/* Shiny background effect */}
+            <div className="absolute inset-0 -z-10 bg-white/20 blur-xl rounded-lg animate-pulse" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-white/10 via-white/30 to-white/10 blur-2xl rounded-lg" />
+          </span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
-          Where <span className="text-neon">Swiss</span> builds the future of{" "}
+          Where <span className="text-white uppercase">SWISS</span> helps build the future of{" "}
           <span className="text-gradient">Web3</span>, <span className="text-gradient">NFTs</span>, and{" "}
-          <span className="text-gradient">Decentralization</span>
+          <span className="text-gradient">hyperfy revolution</span>
         </p>
 
         {/* Feature Pills */}
