@@ -24,6 +24,7 @@ const SwissVRM = () => {
         loader.register((parser) => new VRMLoaderPlugin(parser));
 
         // Load the VRM from GitHub raw URL
+        console.log('Starting VRM load...');
         const gltf = await loader.loadAsync(
           'https://raw.githubusercontent.com/ferazzeid/vrm/main/SWISS.vrm'
         );
@@ -36,35 +37,45 @@ const SwissVRM = () => {
           vrm.scene.position.set(-5, -3.5, 0);
           vrm.scene.rotation.y = Math.PI * 0.25;
           
-          console.log('VRM loaded successfully:', vrm);
+          console.log('VRM loaded successfully, now loading animation...');
           
           // Now load the idle animation
           try {
             const animationLoader = new GLTFLoader();
+            console.log('Loading idle.glb animation...');
             const animationGltf = await animationLoader.loadAsync(
               'https://raw.githubusercontent.com/ferazzeid/vrm/main/idle.glb'
             );
             
-            console.log('Animation loaded:', animationGltf);
+            console.log('Animation GLB loaded:', animationGltf);
+            console.log('Animation count:', animationGltf.animations?.length || 0);
+            console.log('Animations:', animationGltf.animations);
             
             if (animationGltf.animations && animationGltf.animations.length > 0) {
               // Create animation mixer
+              console.log('Creating animation mixer...');
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
               
               // Apply the first animation (idle)
+              console.log('Creating and playing animation action...');
               const action = mixer.clipAction(animationGltf.animations[0]);
+              action.setLoop(THREE.LoopRepeat, Infinity);
+              action.clampWhenFinished = false;
               action.play();
               
-              console.log('Idle animation applied and playing');
+              console.log('✅ Idle animation applied and playing successfully!');
+              console.log('Animation duration:', animationGltf.animations[0].duration);
+              console.log('Animation name:', animationGltf.animations[0].name);
             } else {
-              console.log('No animations found in idle.glb');
-              // Fallback to manual pose if no animation
+              console.warn('❌ No animations found in idle.glb - using manual pose');
               setManualPose(vrm);
             }
           } catch (animError) {
-            console.error('Failed to load idle animation:', animError);
+            console.error('❌ Failed to load idle animation:', animError);
+            console.error('Animation error details:', animError.message);
             // Fallback to manual pose if animation fails
+            console.log('Falling back to manual pose...');
             setManualPose(vrm);
           }
           
@@ -81,16 +92,22 @@ const SwissVRM = () => {
 
     // Helper function for manual pose fallback
     const setManualPose = (vrm: VRM) => {
+      console.log('🔧 Setting manual pose as fallback...');
       if (vrm.humanoid) {
         const leftUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
         const rightUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
         
         if (leftUpperArm) {
           leftUpperArm.rotation.set(0, 0, -1.2);
+          console.log('Manual left arm set');
         }
         if (rightUpperArm) {
           rightUpperArm.rotation.set(0, 0, 1.2);
+          console.log('Manual right arm set');
         }
+        console.log('✅ Manual pose applied');
+      } else {
+        console.warn('❌ No humanoid found for manual pose');
       }
     };
 
