@@ -30,50 +30,58 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for left-side background display
-          vrm.scene.scale.setScalar(4);
-          vrm.scene.position.set(-2.5, -3, 0);
-          vrm.scene.rotation.y = Math.PI * 0.2; // Angled toward center
+          // Scale and position for far left-side display
+          vrm.scene.scale.setScalar(4.5);
+          vrm.scene.position.set(-4, -3.5, 0);
+          vrm.scene.rotation.y = Math.PI * 0.25; // Angled toward center
           
-          // Set up a confident, welcoming pose
+          // Set up a natural relaxed standing pose
           if (vrm.humanoid) {
-            // Left arm - hand on hip pose
+            // Left arm - relaxed down by side
             const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
             const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
             
             if (leftUpperArm) {
-              leftUpperArm.rotation.z = 0.8;
-              leftUpperArm.rotation.x = -0.3;
-              leftUpperArm.rotation.y = 0.2;
+              leftUpperArm.rotation.z = 0.1; // Slight outward angle
+              leftUpperArm.rotation.x = 0.05;
+              leftUpperArm.rotation.y = 0;
             }
             if (leftLowerArm) {
-              leftLowerArm.rotation.z = -0.6;
+              leftLowerArm.rotation.z = -0.1; // Slight bend
             }
 
-            // Right arm - pointing or welcoming gesture
+            // Right arm - relaxed down by side
             const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
             const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
             
             if (rightUpperArm) {
-              rightUpperArm.rotation.z = -0.5;
-              rightUpperArm.rotation.x = -0.2;
-              rightUpperArm.rotation.y = 0.3;
+              rightUpperArm.rotation.z = -0.1;
+              rightUpperArm.rotation.x = 0.05;
+              rightUpperArm.rotation.y = 0;
             }
             if (rightLowerArm) {
-              rightLowerArm.rotation.z = 0.4;
+              rightLowerArm.rotation.z = 0.1;
             }
 
-            // Confident head position looking toward content
+            // Natural head position
             const head = vrm.humanoid.getBoneNode(VRMHumanBoneName.Head);
             if (head) {
-              head.rotation.x = -0.05;
-              head.rotation.y = 0.2;
+              head.rotation.x = 0;
+              head.rotation.y = 0.15; // Looking slightly toward content
+              head.rotation.z = 0;
             }
 
-            // Slight hip tilt for dynamic pose
+            // Relaxed spine
+            const spine = vrm.humanoid.getBoneNode(VRMHumanBoneName.Spine);
+            if (spine) {
+              spine.rotation.x = 0.02; // Slight forward lean
+            }
+
+            // Hip positioning for natural stance
             const hips = vrm.humanoid.getBoneNode(VRMHumanBoneName.Hips);
             if (hips) {
-              hips.rotation.z = 0.05;
+              hips.rotation.z = 0;
+              hips.rotation.x = 0;
             }
           }
           
@@ -96,26 +104,49 @@ const SwissVRM = () => {
     if (vrmRef.current && groupRef.current) {
       const time = state.clock.elapsedTime;
       
-      // Gentle breathing animation
-      groupRef.current.position.y = Math.sin(time * 1.5) * 0.02;
+      // Breathing animation - more pronounced
+      const breathingIntensity = Math.sin(time * 1.2) * 0.08;
+      groupRef.current.position.y = breathingIntensity;
       
-      // Subtle idle head movement
+      // Weight shifting from leg to leg (slower cycle)
+      const weightShift = Math.sin(time * 0.4) * 0.03;
+      groupRef.current.rotation.z = weightShift;
+      
       if (vrmRef.current.humanoid) {
+        // Natural head movement - looking around occasionally
         const head = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Head);
         if (head) {
-          head.rotation.y = Math.sin(time * 0.8) * 0.05;
-          head.rotation.x = -0.1 + Math.sin(time * 1.2) * 0.02;
+          head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.08; // Looking left/right
+          head.rotation.x = Math.sin(time * 0.7) * 0.02; // Slight up/down
         }
 
-        // Slight arm movement for life
+        // Subtle arm movements - occasional gestures
         const leftUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
         const rightUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
         
+        // Left arm subtle sway
         if (leftUpperArm) {
-          leftUpperArm.rotation.z = 0.3 + Math.sin(time * 0.7) * 0.02;
+          leftUpperArm.rotation.z = 0.1 + Math.sin(time * 0.8) * 0.02;
+          leftUpperArm.rotation.x = 0.05 + Math.sin(time * 0.6) * 0.01;
         }
+        
+        // Right arm occasional gesture
         if (rightUpperArm) {
-          rightUpperArm.rotation.z = -0.3 - Math.sin(time * 0.7) * 0.02;
+          const gestureTime = Math.sin(time * 0.2);
+          rightUpperArm.rotation.z = -0.1 + gestureTime * 0.03;
+          rightUpperArm.rotation.x = 0.05 + Math.sin(time * 0.9) * 0.01;
+        }
+
+        // Spine breathing movement
+        const spine = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Spine);
+        if (spine) {
+          spine.rotation.x = 0.02 + Math.sin(time * 1.2) * 0.005;
+        }
+
+        // Hip movement for weight shifting
+        const hips = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Hips);
+        if (hips) {
+          hips.rotation.y = Math.sin(time * 0.4) * 0.02;
         }
       }
       
@@ -166,7 +197,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
       >
         <div className="absolute left-0 top-0 w-full h-full pointer-events-auto">
           <Canvas
-            camera={{ position: [-3, 1, 7], fov: 45 }}
+            camera={{ position: [-5, 1, 8], fov: 50 }}
             style={{ 
               background: 'transparent', 
               width: '100%', 
@@ -187,11 +218,11 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
-              minDistance={4}
-              maxDistance={12}
+              minDistance={5}
+              maxDistance={15}
               maxPolarAngle={Math.PI / 1.5}
               minPolarAngle={Math.PI / 3}
-              target={[-1, 0.5, 0]}
+              target={[-3, 0.5, 0]}
             />
           </Canvas>
         </div>
