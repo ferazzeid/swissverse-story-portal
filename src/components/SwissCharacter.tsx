@@ -32,9 +32,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for display - much bigger for interaction
-          vrm.scene.scale.setScalar(6);
-          vrm.scene.position.set(-3, -4, 0);
+          // Scale and position for display - smaller scale to fit better
+          vrm.scene.scale.setScalar(4);
+          vrm.scene.position.set(-3, -5, 0);
           // Slight left turn for better 3D effect (about 30 degrees)
           vrm.scene.rotation.y = Math.PI + Math.PI * 0.17;
           
@@ -57,75 +57,68 @@ const SwissVRM = () => {
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
               
-              // Clone and retarget the animation for VRM compatibility
-              const originalClip = animationGltf.animations[0];
-              console.log('Original animation tracks:', originalClip.tracks.length);
-              
-              // Create new tracks that map mixamorig bones to VRM bones
-              const newTracks: THREE.KeyframeTrack[] = [];
-              
-              originalClip.tracks.forEach((track) => {
-                const trackName = track.name;
-                console.log('Processing track:', trackName);
-                
-                // Map mixamorig bone names to VRM bone names
-                let newTrackName = trackName;
-                
-                // Replace mixamorig prefix with the actual bone structure
-                if (trackName.includes('mixamorigHips')) {
-                  newTrackName = trackName.replace('mixamorigHips', 'Hips');
-                } else if (trackName.includes('mixamorigSpine')) {
-                  newTrackName = trackName.replace('mixamorigSpine', 'Spine');
-                } else if (trackName.includes('mixamorigLeftUpperArm')) {
-                  newTrackName = trackName.replace('mixamorigLeftUpperArm', 'LeftUpperArm');
-                } else if (trackName.includes('mixamorigRightUpperArm')) {
-                  newTrackName = trackName.replace('mixamorigRightUpperArm', 'RightUpperArm');
-                } else if (trackName.includes('mixamorigLeftLowerArm')) {
-                  newTrackName = trackName.replace('mixamorigLeftLowerArm', 'LeftLowerArm');
-                } else if (trackName.includes('mixamorigRightLowerArm')) {
-                  newTrackName = trackName.replace('mixamorigRightLowerArm', 'RightLowerArm');
-                } else if (trackName.includes('mixamorigLeftHand')) {
-                  newTrackName = trackName.replace('mixamorigLeftHand', 'LeftHand');
-                } else if (trackName.includes('mixamorigRightHand')) {
-                  newTrackName = trackName.replace('mixamorigRightHand', 'RightHand');
-                } else if (trackName.includes('mixamorigHead')) {
-                  newTrackName = trackName.replace('mixamorigHead', 'Head');
-                } else if (trackName.includes('mixamorigNeck')) {
-                  newTrackName = trackName.replace('mixamorigNeck', 'Neck');
-                }
-                
-                // Skip finger tracks that are causing errors
-                if (!trackName.includes('Thumb') && !trackName.includes('Index') && 
-                    !trackName.includes('Middle') && !trackName.includes('Ring') && 
-                    !trackName.includes('Pinky')) {
-                  
-                  // Create new track with corrected name
-                  if (track instanceof THREE.QuaternionKeyframeTrack) {
-                    newTracks.push(new THREE.QuaternionKeyframeTrack(newTrackName, track.times, track.values));
-                  } else if (track instanceof THREE.VectorKeyframeTrack) {
-                    newTracks.push(new THREE.VectorKeyframeTrack(newTrackName, track.times, track.values));
-                  } else if (track instanceof THREE.NumberKeyframeTrack) {
-                    newTracks.push(new THREE.NumberKeyframeTrack(newTrackName, track.times, track.values));
-                  }
-                }
-              });
-              
-              console.log('New tracks created:', newTracks.length);
-              
-              // Create new animation clip with retargeted tracks
-              const retargetedClip = new THREE.AnimationClip(originalClip.name + '_retargeted', originalClip.duration, newTracks);
-              
+              // Simplified approach - try to apply animation directly first
               try {
-                const action = mixer.clipAction(retargetedClip);
+                console.log('Trying direct animation application...');
+                const action = mixer.clipAction(animationGltf.animations[0]);
                 action.setLoop(THREE.LoopRepeat, Infinity);
                 action.clampWhenFinished = false;
+                action.weight = 1;
                 action.play();
                 
-                console.log('✅ Retargeted animation playing successfully!');
-              } catch (animPlayError) {
-                console.warn('❌ Retargeted animation failed - using manual pose');
-                console.warn('Animation error:', animPlayError);
-                setManualPose(vrm);
+                console.log('✅ Direct animation application successful!');
+              } catch (directError) {
+                console.log('Direct application failed, trying bone retargeting...');
+                console.log('Direct error:', directError.message);
+                
+                // Fallback: Try to find and map the bones manually
+                try {
+                  const humanoid = vrm.humanoid;
+                  if (humanoid) {
+                    console.log('Found VRM humanoid, applying manual animation...');
+                    
+                    // Apply a simple idle animation manually
+                    const applyIdleAnimation = () => {
+                      const time = Date.now() * 0.001;
+                      
+                      // Breathing motion
+                      const spine = humanoid.getBoneNode(VRMHumanBoneName.Spine);
+                      if (spine) {
+                        spine.rotation.x = Math.sin(time * 2) * 0.02;
+                      }
+                      
+                      // Subtle head movement
+                      const head = humanoid.getBoneNode(VRMHumanBoneName.Head);
+                      if (head) {
+                        head.rotation.y = Math.sin(time * 0.8) * 0.05;
+                        head.rotation.x = Math.sin(time * 1.2) * 0.02;
+                      }
+                      
+                      // Arm positioning - natural idle pose
+                      const leftUpperArm = humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
+                      const rightUpperArm = humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+                      
+                      if (leftUpperArm) {
+                        leftUpperArm.rotation.set(0.1, 0, -0.3 + Math.sin(time * 1.5) * 0.05);
+                      }
+                      if (rightUpperArm) {
+                        rightUpperArm.rotation.set(0.1, 0, 0.3 + Math.sin(time * 1.5 + Math.PI) * 0.05);
+                      }
+                    };
+                    
+                    // Store the animation function to be called in useFrame
+                    (vrm as any).customIdleAnimation = applyIdleAnimation;
+                    console.log('✅ Custom idle animation set up successfully!');
+                  } else {
+                    console.warn('No humanoid found, using basic manual pose');
+                    setManualPose(vrm);
+                  }
+                } catch (manualError) {
+                  console.warn('Manual animation failed:', manualError);
+                  setManualPose(vrm);
+                }
+                
+                // Disable mixer since we're using manual animation
                 mixerRef.current = null;
               }
             } else {
@@ -182,8 +175,11 @@ const SwissVRM = () => {
       // Update animation mixer if it exists
       if (mixerRef.current) {
         mixerRef.current.update(delta);
+      } else if ((vrmRef.current as any).customIdleAnimation) {
+        // Use custom idle animation if available
+        (vrmRef.current as any).customIdleAnimation();
       } else {
-        // Fallback to manual animations if no GLB animation is loaded
+        // Fallback to basic manual animations
         // Breathing animation - more pronounced
         const breathingIntensity = Math.sin(time * 1.2) * 0.05;
         groupRef.current.position.y = breathingIntensity;
