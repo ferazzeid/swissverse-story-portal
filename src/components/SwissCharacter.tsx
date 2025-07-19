@@ -37,30 +37,57 @@ const SwissVRM = () => {
           
           // Set up a natural relaxed standing pose
           if (vrm.humanoid) {
-            // Left arm - relaxed down by side
-            const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-            const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
+            // SHOULDERS - bring them down first
+            const leftShoulder = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftShoulder);
+            const rightShoulder = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightShoulder);
             
-            if (leftUpperArm) {
-              leftUpperArm.rotation.z = 0.1; // Slight outward angle
-              leftUpperArm.rotation.x = 0.05;
-              leftUpperArm.rotation.y = 0;
+            if (leftShoulder) {
+              leftShoulder.rotation.z = -0.2; // Lower the shoulder
             }
-            if (leftLowerArm) {
-              leftLowerArm.rotation.z = -0.1; // Slight bend
+            if (rightShoulder) {
+              rightShoulder.rotation.z = 0.2; // Lower the shoulder
             }
 
-            // Right arm - relaxed down by side
+            // LEFT ARM - force it down by the side
+            const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
+            const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
+            const leftHand = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftHand);
+            
+            if (leftUpperArm) {
+              leftUpperArm.rotation.x = 0; // No forward/back
+              leftUpperArm.rotation.y = 0; // No twist
+              leftUpperArm.rotation.z = -1.4; // Rotate down dramatically
+            }
+            if (leftLowerArm) {
+              leftLowerArm.rotation.x = 0;
+              leftLowerArm.rotation.y = 0;
+              leftLowerArm.rotation.z = 0.3; // Slight bend at elbow
+            }
+            if (leftHand) {
+              leftHand.rotation.x = 0;
+              leftHand.rotation.y = 0;
+              leftHand.rotation.z = 0;
+            }
+
+            // RIGHT ARM - force it down by the side
             const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
             const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
+            const rightHand = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightHand);
             
             if (rightUpperArm) {
-              rightUpperArm.rotation.z = -0.1;
-              rightUpperArm.rotation.x = 0.05;
+              rightUpperArm.rotation.x = 0;
               rightUpperArm.rotation.y = 0;
+              rightUpperArm.rotation.z = 1.4; // Rotate down dramatically
             }
             if (rightLowerArm) {
-              rightLowerArm.rotation.z = 0.1;
+              rightLowerArm.rotation.x = 0;
+              rightLowerArm.rotation.y = 0;
+              rightLowerArm.rotation.z = -0.3; // Slight bend at elbow
+            }
+            if (rightHand) {
+              rightHand.rotation.x = 0;
+              rightHand.rotation.y = 0;
+              rightHand.rotation.z = 0;
             }
 
             // Natural head position
@@ -120,21 +147,20 @@ const SwissVRM = () => {
           head.rotation.x = Math.sin(time * 0.7) * 0.02; // Slight up/down
         }
 
-        // Subtle arm movements - occasional gestures
+        // Subtle arm movements - keeping them down
         const leftUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
         const rightUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
         
-        // Left arm subtle sway
+        // Left arm - maintain downward position with subtle sway
         if (leftUpperArm) {
-          leftUpperArm.rotation.z = 0.1 + Math.sin(time * 0.8) * 0.02;
-          leftUpperArm.rotation.x = 0.05 + Math.sin(time * 0.6) * 0.01;
+          leftUpperArm.rotation.z = -1.4 + Math.sin(time * 0.8) * 0.05; // Keep down, slight sway
+          leftUpperArm.rotation.x = Math.sin(time * 0.6) * 0.02;
         }
         
-        // Right arm occasional gesture
+        // Right arm - maintain downward position with subtle movement
         if (rightUpperArm) {
-          const gestureTime = Math.sin(time * 0.2);
-          rightUpperArm.rotation.z = -0.1 + gestureTime * 0.03;
-          rightUpperArm.rotation.x = 0.05 + Math.sin(time * 0.9) * 0.01;
+          rightUpperArm.rotation.z = 1.4 + Math.sin(time * 0.7) * 0.05; // Keep down, slight sway
+          rightUpperArm.rotation.x = Math.sin(time * 0.9) * 0.02;
         }
 
         // Spine breathing movement
