@@ -30,60 +30,73 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for far left-side display
-          vrm.scene.scale.setScalar(4.5);
-          vrm.scene.position.set(-4, -3.5, 0);
+          // Scale and position for far left-side display  
+          vrm.scene.scale.setScalar(3.5); // Reduced scale for better view
+          vrm.scene.position.set(-5, -3.5, 0); // More to the left
           vrm.scene.rotation.y = Math.PI * 0.25; // Angled toward center
           
-          // Set up a natural relaxed standing pose - try a different approach
+          // Set up a natural relaxed standing pose using new API
           if (vrm.humanoid) {
             console.log('Available bones:', vrm.humanoid.humanBones);
             
-            // Try to access bones differently and log what we find
-            const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-            const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+            // Use getRawBoneNode instead of deprecated getBoneNode
+            const leftUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
+            const rightUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
+            const leftShoulder = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftShoulder);
+            const rightShoulder = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightShoulder);
             
             console.log('Left upper arm bone:', leftUpperArm);
             console.log('Right upper arm bone:', rightUpperArm);
             
-            // Force T-pose override using different method
+            // Drop shoulders first
+            if (leftShoulder) {
+              leftShoulder.rotation.z = 0.3; // Drop left shoulder
+              console.log('Dropped left shoulder');
+            }
+            
+            if (rightShoulder) {
+              rightShoulder.rotation.z = -0.3; // Drop right shoulder  
+              console.log('Dropped right shoulder');
+            }
+            
+            // Aggressively move arms down from T-pose
             if (leftUpperArm) {
-              // Try using quaternion instead of euler angles
-              const leftQuaternion = new THREE.Quaternion();
-              leftQuaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/3); // -60 degrees
-              leftUpperArm.quaternion.copy(leftQuaternion);
-              console.log('Set left arm quaternion');
+              // Reset first, then apply strong downward rotation
+              leftUpperArm.rotation.set(0, 0, 0);
+              leftUpperArm.rotation.z = -1.2; // Strong downward rotation (about -69 degrees)
+              leftUpperArm.rotation.x = 0.2; // Slight forward
+              console.log('Set left arm down aggressively');
             }
             
             if (rightUpperArm) {
-              const rightQuaternion = new THREE.Quaternion();
-              rightQuaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI/3); // 60 degrees  
-              rightUpperArm.quaternion.copy(rightQuaternion);
-              console.log('Set right arm quaternion');
+              // Reset first, then apply strong downward rotation
+              rightUpperArm.rotation.set(0, 0, 0);
+              rightUpperArm.rotation.z = 1.2; // Strong downward rotation (about 69 degrees)
+              rightUpperArm.rotation.x = 0.2; // Slight forward
+              console.log('Set right arm down aggressively');
             }
 
-            // Try lower arms too
-            const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
-            const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
+            // Set lower arms
+            const leftLowerArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftLowerArm);
+            const rightLowerArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightLowerArm);
             
             if (leftLowerArm) {
-              const leftLowerQ = new THREE.Quaternion();
-              leftLowerQ.setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0.3);
-              leftLowerArm.quaternion.copy(leftLowerQ);
+              leftLowerArm.rotation.z = 0.4; // Bend elbow slightly
+              console.log('Set left lower arm');
             }
             
             if (rightLowerArm) {
-              const rightLowerQ = new THREE.Quaternion();
-              rightLowerQ.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -0.3);
-              rightLowerArm.quaternion.copy(rightLowerQ);
+              rightLowerArm.rotation.z = -0.4; // Bend elbow slightly
+              console.log('Set right lower arm');
             }
 
             // Set head position
-            const head = vrm.humanoid.getBoneNode(VRMHumanBoneName.Head);
+            const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
             if (head) {
               head.rotation.x = 0;
               head.rotation.y = 0.15;
               head.rotation.z = 0;
+              console.log('Set head position');
             }
           }
           
@@ -116,42 +129,40 @@ const SwissVRM = () => {
       
       if (vrmRef.current.humanoid) {
         // Natural head movement - looking around occasionally
-        const head = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Head);
+        const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
         if (head) {
           head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.08; // Looking left/right
           head.rotation.x = Math.sin(time * 0.7) * 0.02; // Slight up/down
         }
 
-        // Subtle arm movements - keeping them down using quaternions
-        const leftUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-        const rightUpperArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+        // Maintain arm positions and add subtle movements
+        const leftUpperArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
+        const rightUpperArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
         
         // Left arm - maintain downward position with subtle sway
         if (leftUpperArm) {
-          const leftBaseAngle = -Math.PI/3; // -60 degrees base
-          const leftSway = Math.sin(time * 0.8) * 0.05;
-          const leftQ = new THREE.Quaternion();
-          leftQ.setFromAxisAngle(new THREE.Vector3(0, 0, 1), leftBaseAngle + leftSway);
-          leftUpperArm.quaternion.copy(leftQ);
+          const leftBaseDrop = -1.2; // Keep base downward rotation
+          const leftSway = Math.sin(time * 0.8) * 0.03; // Smaller sway
+          leftUpperArm.rotation.z = leftBaseDrop + leftSway;
+          leftUpperArm.rotation.x = 0.2 + Math.sin(time * 0.6) * 0.02;
         }
         
         // Right arm - maintain downward position with subtle movement
         if (rightUpperArm) {
-          const rightBaseAngle = Math.PI/3; // 60 degrees base
-          const rightSway = Math.sin(time * 0.7) * 0.05;
-          const rightQ = new THREE.Quaternion();
-          rightQ.setFromAxisAngle(new THREE.Vector3(0, 0, 1), rightBaseAngle + rightSway);
-          rightUpperArm.quaternion.copy(rightQ);
+          const rightBaseDrop = 1.2; // Keep base downward rotation
+          const rightSway = Math.sin(time * 0.7) * 0.03; // Smaller sway
+          rightUpperArm.rotation.z = rightBaseDrop + rightSway;
+          rightUpperArm.rotation.x = 0.2 + Math.sin(time * 0.5) * 0.02;
         }
 
         // Spine breathing movement
-        const spine = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Spine);
+        const spine = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Spine);
         if (spine) {
           spine.rotation.x = 0.02 + Math.sin(time * 1.2) * 0.005;
         }
 
         // Hip movement for weight shifting
-        const hips = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.Hips);
+        const hips = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Hips);
         if (hips) {
           hips.rotation.y = Math.sin(time * 0.4) * 0.02;
         }
@@ -204,7 +215,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
       >
         <div className="absolute left-0 top-0 w-full h-full pointer-events-auto">
           <Canvas
-            camera={{ position: [-5, 2, 10], fov: 40 }}
+            camera={{ position: [-5, 2, 15], fov: 45 }} // Much further back
             style={{ 
               background: 'transparent', 
               width: '100%', 
@@ -225,11 +236,11 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
-              minDistance={8}
-              maxDistance={12}
+              minDistance={12} // Increased minimum distance
+              maxDistance={20} // Increased maximum distance  
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-3, 1, 0]}
+              target={[-4, 0, 0]} // Adjusted target for left positioning
             />
           </Canvas>
         </div>
