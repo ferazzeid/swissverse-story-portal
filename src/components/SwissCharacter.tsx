@@ -8,12 +8,13 @@ import * as THREE from 'three';
 const SwissVRM = () => {
   const vrmRef = useRef<VRM | null>(null);
   const groupRef = useRef<THREE.Group>(null);
+  const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const [vrm, setVrm] = useState<VRM | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadVRM = async () => {
+    const loadVRMAndAnimation = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -31,78 +32,44 @@ const SwissVRM = () => {
         
         if (vrm) {
           // Scale and position for far left-side display  
-          vrm.scene.scale.setScalar(3.5); // Reduced scale for better view
-          vrm.scene.position.set(-5, -3.5, 0); // More to the left
-          vrm.scene.rotation.y = Math.PI * 0.25; // Angled toward center
+          vrm.scene.scale.setScalar(3.5);
+          vrm.scene.position.set(-5, -3.5, 0);
+          vrm.scene.rotation.y = Math.PI * 0.25;
           
-          // Set up a natural relaxed standing pose using new API
-          if (vrm.humanoid) {
-            console.log('Available bones:', vrm.humanoid.humanBones);
+          console.log('VRM loaded successfully:', vrm);
+          
+          // Now load the idle animation
+          try {
+            const animationLoader = new GLTFLoader();
+            const animationGltf = await animationLoader.loadAsync(
+              'https://raw.githubusercontent.com/ferazzeid/vrm/main/idle.glb'
+            );
             
-            // Use getRawBoneNode instead of deprecated getBoneNode
-            const leftUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
-            const rightUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
-            const leftShoulder = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftShoulder);
-            const rightShoulder = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightShoulder);
+            console.log('Animation loaded:', animationGltf);
             
-            console.log('Left upper arm bone:', leftUpperArm);
-            console.log('Right upper arm bone:', rightUpperArm);
-            
-            // Drop shoulders first
-            if (leftShoulder) {
-              leftShoulder.rotation.z = 0.3; // Drop left shoulder
-              console.log('Dropped left shoulder');
+            if (animationGltf.animations && animationGltf.animations.length > 0) {
+              // Create animation mixer
+              const mixer = new THREE.AnimationMixer(vrm.scene);
+              mixerRef.current = mixer;
+              
+              // Apply the first animation (idle)
+              const action = mixer.clipAction(animationGltf.animations[0]);
+              action.play();
+              
+              console.log('Idle animation applied and playing');
+            } else {
+              console.log('No animations found in idle.glb');
+              // Fallback to manual pose if no animation
+              setManualPose(vrm);
             }
-            
-            if (rightShoulder) {
-              rightShoulder.rotation.z = -0.3; // Drop right shoulder  
-              console.log('Dropped right shoulder');
-            }
-            
-            // Aggressively move arms down from T-pose
-            if (leftUpperArm) {
-              // Reset first, then apply strong downward rotation
-              leftUpperArm.rotation.set(0, 0, 0);
-              leftUpperArm.rotation.z = -1.2; // Strong downward rotation (about -69 degrees)
-              leftUpperArm.rotation.x = 0.2; // Slight forward
-              console.log('Set left arm down aggressively');
-            }
-            
-            if (rightUpperArm) {
-              // Reset first, then apply strong downward rotation
-              rightUpperArm.rotation.set(0, 0, 0);
-              rightUpperArm.rotation.z = 1.2; // Strong downward rotation (about 69 degrees)
-              rightUpperArm.rotation.x = 0.2; // Slight forward
-              console.log('Set right arm down aggressively');
-            }
-
-            // Set lower arms
-            const leftLowerArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftLowerArm);
-            const rightLowerArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightLowerArm);
-            
-            if (leftLowerArm) {
-              leftLowerArm.rotation.z = 0.4; // Bend elbow slightly
-              console.log('Set left lower arm');
-            }
-            
-            if (rightLowerArm) {
-              rightLowerArm.rotation.z = -0.4; // Bend elbow slightly
-              console.log('Set right lower arm');
-            }
-
-            // Set head position
-            const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-            if (head) {
-              head.rotation.x = 0;
-              head.rotation.y = 0.15;
-              head.rotation.z = 0;
-              console.log('Set head position');
-            }
+          } catch (animError) {
+            console.error('Failed to load idle animation:', animError);
+            // Fallback to manual pose if animation fails
+            setManualPose(vrm);
           }
           
           setVrm(vrm);
           vrmRef.current = vrm;
-          console.log('VRM loaded successfully:', vrm);
         }
       } catch (err) {
         console.error('Failed to load VRM:', err);
@@ -112,59 +79,48 @@ const SwissVRM = () => {
       }
     };
 
-    loadVRM();
+    // Helper function for manual pose fallback
+    const setManualPose = (vrm: VRM) => {
+      if (vrm.humanoid) {
+        const leftUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
+        const rightUpperArm = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
+        
+        if (leftUpperArm) {
+          leftUpperArm.rotation.set(0, 0, -1.2);
+        }
+        if (rightUpperArm) {
+          rightUpperArm.rotation.set(0, 0, 1.2);
+        }
+      }
+    };
+
+    loadVRMAndAnimation();
   }, []);
 
   useFrame((state, delta) => {
     if (vrmRef.current && groupRef.current) {
       const time = state.clock.elapsedTime;
       
-      // Breathing animation - more pronounced
-      const breathingIntensity = Math.sin(time * 1.2) * 0.08;
-      groupRef.current.position.y = breathingIntensity;
-      
-      // Weight shifting from leg to leg (slower cycle)
-      const weightShift = Math.sin(time * 0.4) * 0.03;
-      groupRef.current.rotation.z = weightShift;
-      
-      if (vrmRef.current.humanoid) {
-        // Natural head movement - looking around occasionally
-        const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-        if (head) {
-          head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.08; // Looking left/right
-          head.rotation.x = Math.sin(time * 0.7) * 0.02; // Slight up/down
-        }
-
-        // Maintain arm positions and add subtle movements
-        const leftUpperArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
-        const rightUpperArm = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
+      // Update animation mixer if it exists
+      if (mixerRef.current) {
+        mixerRef.current.update(delta);
+      } else {
+        // Fallback to manual animations if no GLB animation is loaded
+        // Breathing animation - more pronounced
+        const breathingIntensity = Math.sin(time * 1.2) * 0.05;
+        groupRef.current.position.y = breathingIntensity;
         
-        // Left arm - maintain downward position with subtle sway
-        if (leftUpperArm) {
-          const leftBaseDrop = -1.2; // Keep base downward rotation
-          const leftSway = Math.sin(time * 0.8) * 0.03; // Smaller sway
-          leftUpperArm.rotation.z = leftBaseDrop + leftSway;
-          leftUpperArm.rotation.x = 0.2 + Math.sin(time * 0.6) * 0.02;
-        }
+        // Weight shifting from leg to leg (slower cycle)
+        const weightShift = Math.sin(time * 0.4) * 0.02;
+        groupRef.current.rotation.z = weightShift;
         
-        // Right arm - maintain downward position with subtle movement
-        if (rightUpperArm) {
-          const rightBaseDrop = 1.2; // Keep base downward rotation
-          const rightSway = Math.sin(time * 0.7) * 0.03; // Smaller sway
-          rightUpperArm.rotation.z = rightBaseDrop + rightSway;
-          rightUpperArm.rotation.x = 0.2 + Math.sin(time * 0.5) * 0.02;
-        }
-
-        // Spine breathing movement
-        const spine = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Spine);
-        if (spine) {
-          spine.rotation.x = 0.02 + Math.sin(time * 1.2) * 0.005;
-        }
-
-        // Hip movement for weight shifting
-        const hips = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Hips);
-        if (hips) {
-          hips.rotation.y = Math.sin(time * 0.4) * 0.02;
+        if (vrmRef.current.humanoid) {
+          // Natural head movement - looking around occasionally
+          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+          if (head) {
+            head.rotation.y = 0.15 + Math.sin(time * 0.3) * 0.05;
+            head.rotation.x = Math.sin(time * 0.7) * 0.01;
+          }
         }
       }
       
