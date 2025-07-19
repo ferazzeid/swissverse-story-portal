@@ -40,9 +40,37 @@ const SwissVRM = () => {
           
           console.log('VRM loaded successfully');
           
+          // DEEP ANALYSIS: Let's inspect what we actually have
+          console.log('=== VRM DEEP ANALYSIS START ===');
+          console.log('VRM scene:', vrm.scene);
+          console.log('VRM humanoid:', vrm.humanoid);
+          
+          if (vrm.humanoid) {
+            console.log('Humanoid bones available:');
+            Object.values(VRMHumanBoneName).forEach(boneName => {
+              const bone = vrm.humanoid?.getBoneNode(boneName);
+              if (bone) {
+                console.log(`✅ ${boneName}:`, bone.name, 'rotation:', bone.rotation);
+              } else {
+                console.log(`❌ ${boneName}: NOT FOUND`);
+              }
+            });
+          }
+          
+          // Let's also check the raw scene structure
+          console.log('Raw scene children:', vrm.scene.children);
+          vrm.scene.traverse((child) => {
+            if (child.type === 'Bone' || child.name.includes('Arm') || child.name.includes('arm')) {
+              console.log('Found bone/arm:', child.name, child.type, 'rotation:', child.rotation);
+            }
+          });
+          
+          console.log('=== VRM DEEP ANALYSIS END ===');
+          
           // IMMEDIATELY fix T-pose regardless of animation
-          console.log('Fixing T-pose immediately...');
-          setManualPose(vrm);
+          console.log('🔧 ATTEMPTING T-POSE FIX...');
+          const tPoseFixed = setManualPose(vrm);
+          console.log('T-pose fix result:', tPoseFixed);
           
           console.log('Now attempting animation...');
           
@@ -150,45 +178,80 @@ const SwissVRM = () => {
       }
     };
 
-    // Helper function for manual pose - GUARANTEED to fix T-pose
-    const setManualPose = (vrm: VRM) => {
-      console.log('🔧 Setting manual pose to fix T-pose...');
-      if (vrm.humanoid) {
-        try {
-          // Get arm bones using VRM humanoid bone names
-          const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-          const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
-          const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
-          const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
-          
-          if (leftUpperArm) {
-            // Natural hanging left arm position
-            leftUpperArm.rotation.set(0.2, 0, -0.5);
-            console.log('✅ Left upper arm positioned');
-          }
-          if (rightUpperArm) {
-            // Natural hanging right arm position
-            rightUpperArm.rotation.set(0.2, 0, 0.5);
-            console.log('✅ Right upper arm positioned');
-          }
-          if (leftLowerArm) {
-            // Slight bend in left elbow
-            leftLowerArm.rotation.set(0, 0, -0.3);
-            console.log('✅ Left lower arm positioned');
-          }
-          if (rightLowerArm) {
-            // Slight bend in right elbow
-            rightLowerArm.rotation.set(0, 0, 0.3);
-            console.log('✅ Right lower arm positioned');
-          }
-          
-          console.log('✅ T-pose FIXED! Arms should now be in natural position');
-        } catch (error) {
-          console.error('❌ Error setting manual pose:', error);
-        }
-      } else {
-        console.warn('❌ No humanoid found for manual pose');
+    // Enhanced manual pose function with detailed analysis
+    const setManualPose = (vrm: VRM): boolean => {
+      console.log('🔧 === MANUAL POSE SETTING START ===');
+      
+      if (!vrm.humanoid) {
+        console.error('❌ NO HUMANOID FOUND - this is the main problem!');
+        return false;
       }
+      
+      console.log('✅ Humanoid found, proceeding with pose setting...');
+      let successCount = 0;
+      let totalAttempts = 0;
+      
+      // Try multiple approaches to set arm positions
+      const armBones = [
+        { name: VRMHumanBoneName.LeftUpperArm, side: 'left', type: 'upper' },
+        { name: VRMHumanBoneName.RightUpperArm, side: 'right', type: 'upper' },
+        { name: VRMHumanBoneName.LeftLowerArm, side: 'left', type: 'lower' },
+        { name: VRMHumanBoneName.RightLowerArm, side: 'right', type: 'lower' }
+      ];
+      
+      armBones.forEach(({ name, side, type }) => {
+        totalAttempts++;
+        try {
+          const bone = vrm.humanoid!.getBoneNode(name);
+          if (bone) {
+            console.log(`✅ Found ${side} ${type} arm bone:`, bone.name);
+            
+            // Store original rotation
+            const originalRotation = bone.rotation.clone();
+            console.log(`Original ${side} ${type} rotation:`, originalRotation);
+            
+            // Apply new rotation based on side and type
+            if (type === 'upper') {
+              if (side === 'left') {
+                bone.rotation.set(0.2, 0, -0.8); // More aggressive left arm down
+              } else {
+                bone.rotation.set(0.2, 0, 0.8); // More aggressive right arm down
+              }
+            } else {
+              // Lower arm - add elbow bend
+              if (side === 'left') {
+                bone.rotation.set(0, 0, -0.5);
+              } else {
+                bone.rotation.set(0, 0, 0.5);
+              }
+            }
+            
+            console.log(`New ${side} ${type} rotation:`, bone.rotation);
+            
+            // Force update
+            bone.updateMatrixWorld(true);
+            successCount++;
+            
+            // Verify the change took effect
+            setTimeout(() => {
+              console.log(`Verification - ${side} ${type} rotation after 100ms:`, bone.rotation);
+            }, 100);
+            
+          } else {
+            console.warn(`❌ ${side} ${type} arm bone NOT FOUND`);
+          }
+        } catch (error) {
+          console.error(`❌ Error setting ${side} ${type} arm:`, error);
+        }
+      });
+      
+      // Force VRM update
+      vrm.update(0.016); // Simulate one frame update
+      
+      console.log(`🔧 Manual pose result: ${successCount}/${totalAttempts} bones positioned`);
+      console.log('🔧 === MANUAL POSE SETTING END ===');
+      
+      return successCount > 0;
     };
 
     loadVRMAndAnimation();
@@ -197,6 +260,17 @@ const SwissVRM = () => {
   useFrame((state, delta) => {
     if (vrmRef.current && groupRef.current) {
       const time = state.clock.elapsedTime;
+      
+      // Every 5 seconds, verify the pose is still correct
+      if (Math.floor(time) % 5 === 0 && Math.floor(time * 10) % 10 === 0) {
+        console.log('🔍 Periodic pose check at', Math.floor(time), 'seconds');
+        if (vrmRef.current.humanoid) {
+          const leftArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
+          const rightArm = vrmRef.current.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+          if (leftArm) console.log('Left arm rotation:', leftArm.rotation);
+          if (rightArm) console.log('Right arm rotation:', rightArm.rotation);
+        }
+      }
       
       // Update animation mixer if it exists
       if (mixerRef.current) {
