@@ -50,8 +50,8 @@ export const HeroSection = () => {
 
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
-          Welcome to the{" "}
-          <span className="text-gradient">Swissverse</span>
+          <span className="text-gradient">Welcome to the</span>{" "}
+          <span className="text-white uppercase">SWISSVERSE</span>
         </h1>
 
         {/* Subtitle */}
@@ -81,13 +81,23 @@ export const HeroSection = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button variant="cyber" size="xl" className="group">
+          <Button 
+            variant="cyber" 
+            size="xl" 
+            className="group"
+            onClick={() => window.open('https://hyperfy.io/swissverse', '_blank')}
+          >
             <Globe className="mr-2 group-hover:rotate-12 transition-transform" />
             Visit the Metaverse
           </Button>
-          <Button variant="glow" size="xl" className="group">
+          <Button 
+            variant="glow" 
+            size="xl" 
+            className="group"
+            onClick={() => window.open('https://x.com/swissverse', '_blank')}
+          >
             <Sparkles className="mr-2 group-hover:scale-110 transition-transform" />
-            Explore Projects
+            Follow on X
           </Button>
         </div>
 
