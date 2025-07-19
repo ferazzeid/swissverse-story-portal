@@ -36,8 +36,8 @@ const SwissVRM = () => {
           // Scale and position - back to reasonable 3D position for good rotation
           vrm.scene.scale.setScalar(5);
           vrm.scene.position.set(-4, -4.5, 0); // Back to -4 for proper rotation center
-          // Start facing more toward the user (120 degrees rotation)
-          vrm.scene.rotation.y = Math.PI * 2/3; // About 120 degrees to face user
+          // Start facing more toward the user (240 degrees in opposite direction)
+          vrm.scene.rotation.y = -Math.PI * 2/3; // About -120 degrees (or 240 degrees) to face user
           
           console.log('VRM loaded successfully');
           
@@ -290,9 +290,9 @@ const SwissVRM = () => {
         // Use custom idle animation if available
         (vrmRef.current as any).customIdleAnimation();
       } else {
-        // 360-degree slow rotation animation starting from 120 degrees
+        // 360-degree slow rotation animation starting from -120 degrees (240 degrees)
         if (vrmRef.current) {
-          vrmRef.current.scene.rotation.y = (Math.PI * 2/3) + (time * 0.2); // Start from 120 degrees + rotation
+          vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Start from -120 degrees + rotation
         }
         
         // Fallback to basic manual animations
