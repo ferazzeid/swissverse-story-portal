@@ -33,9 +33,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position - moved much further left to not block heading
+          // Scale and position - positioned for left-center visibility
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-5, -4.5, 0); // Reset to reasonable left position
+          vrm.scene.position.set(-2, -4.5, 0); // Moved closer to center from -5
           // Start facing forward - rotation will be animated
           vrm.scene.rotation.y = 0;
           
@@ -359,8 +359,8 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
         className="absolute inset-0 z-0 pointer-events-none select-none"
         style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
       >
-        {/* Position canvas to show avatar on left side */}
-        <div className="absolute left-0 top-0 w-1/2 h-full pointer-events-auto">
+        {/* Position canvas to show avatar on left-center area */}
+        <div className="absolute left-0 top-0 w-3/4 h-full pointer-events-auto">
           <Canvas
             camera={{ position: [0, 2, 12], fov: 45 }} // Camera looking straight ahead
             style={{ 
