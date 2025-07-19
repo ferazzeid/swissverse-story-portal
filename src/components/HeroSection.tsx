@@ -15,7 +15,8 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden select-none"
+             style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background/90">
         <div className="absolute inset-0 opacity-30">

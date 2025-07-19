@@ -30,17 +30,16 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale the model appropriately for background display
-          vrm.scene.scale.setScalar(3.5);
-          vrm.scene.position.set(-1, -2.5, 0);
-          vrm.scene.rotation.y = Math.PI * 0.15; // Angled to show character better
+          // Scale and position for left-side background display
+          vrm.scene.scale.setScalar(4);
+          vrm.scene.position.set(-2.5, -3, 0);
+          vrm.scene.rotation.y = Math.PI * 0.2; // Angled toward center
           
           // Set up a confident, welcoming pose
           if (vrm.humanoid) {
             // Left arm - hand on hip pose
             const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
             const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
-            const leftHand = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftHand);
             
             if (leftUpperArm) {
               leftUpperArm.rotation.z = 0.8;
@@ -51,23 +50,24 @@ const SwissVRM = () => {
               leftLowerArm.rotation.z = -0.6;
             }
 
-            // Right arm - relaxed by side
+            // Right arm - pointing or welcoming gesture
             const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
             const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
             
             if (rightUpperArm) {
-              rightUpperArm.rotation.z = -0.2;
-              rightUpperArm.rotation.x = -0.1;
+              rightUpperArm.rotation.z = -0.5;
+              rightUpperArm.rotation.x = -0.2;
+              rightUpperArm.rotation.y = 0.3;
             }
             if (rightLowerArm) {
-              rightLowerArm.rotation.z = 0.3;
+              rightLowerArm.rotation.z = 0.4;
             }
 
-            // Confident head position
+            // Confident head position looking toward content
             const head = vrm.humanoid.getBoneNode(VRMHumanBoneName.Head);
             if (head) {
               head.rotation.x = -0.05;
-              head.rotation.y = 0.1;
+              head.rotation.y = 0.2;
             }
 
             // Slight hip tilt for dynamic pose
@@ -160,11 +160,20 @@ const SwissVRM = () => {
 export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
   if (isHero) {
     return (
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-full pointer-events-auto">
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none select-none"
+        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+      >
+        <div className="absolute left-0 top-0 w-full h-full pointer-events-auto">
           <Canvas
-            camera={{ position: [-2, 1, 6], fov: 45 }}
-            style={{ background: 'transparent', width: '100%', height: '100%' }}
+            camera={{ position: [-3, 1, 7], fov: 45 }}
+            style={{ 
+              background: 'transparent', 
+              width: '100%', 
+              height: '100%',
+              userSelect: 'none',
+              WebkitUserSelect: 'none'
+            }}
           >
             <ambientLight intensity={0.8} />
             <directionalLight 
@@ -178,11 +187,11 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
-              minDistance={3}
-              maxDistance={10}
+              minDistance={4}
+              maxDistance={12}
               maxPolarAngle={Math.PI / 1.5}
               minPolarAngle={Math.PI / 3}
-              target={[0, 0.5, 0]}
+              target={[-1, 0.5, 0]}
             />
           </Canvas>
         </div>
