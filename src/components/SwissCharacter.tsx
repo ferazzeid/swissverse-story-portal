@@ -170,6 +170,23 @@ const SwissVRM = () => {
           
           setVrm(vrm);
           vrmRef.current = vrm;
+          
+          // FORCE T-pose fix AFTER everything is set up - with persistence
+          console.log('🔧 FINAL T-POSE FIX ATTEMPT...');
+          setTimeout(() => {
+            const finalResult = setManualPose(vrm);
+            console.log('Final T-pose fix result:', finalResult);
+            
+            // Double-check after another delay
+            setTimeout(() => {
+              if (vrm.humanoid) {
+                const leftCheck = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.LeftUpperArm);
+                const rightCheck = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.RightUpperArm);
+                console.log('FINAL CHECK - Left arm:', leftCheck?.rotation);
+                console.log('FINAL CHECK - Right arm:', rightCheck?.rotation);
+              }
+            }, 500);
+          }, 200);
         }
       } catch (err) {
         console.error('Failed to load VRM:', err);
@@ -211,26 +228,34 @@ const SwissVRM = () => {
             const originalRotation = bone.rotation.clone();
             console.log(`Original ${side} ${type} rotation:`, originalRotation);
             
+            // FORCE the rotation change by disabling auto-updates temporarily
+            const originalMatrixAutoUpdate = bone.matrixAutoUpdate;
+            bone.matrixAutoUpdate = false;
+            
             // Apply new rotation based on side and type
             if (type === 'upper') {
               if (side === 'left') {
-                bone.rotation.set(0.2, 0, -0.8); // More aggressive left arm down
+                bone.rotation.set(0.2, 0, -1.2); // VERY aggressive left arm down
               } else {
-                bone.rotation.set(0.2, 0, 0.8); // More aggressive right arm down
+                bone.rotation.set(0.2, 0, 1.2); // VERY aggressive right arm down
               }
             } else {
               // Lower arm - add elbow bend
               if (side === 'left') {
-                bone.rotation.set(0, 0, -0.5);
+                bone.rotation.set(0, 0, -0.8);
               } else {
-                bone.rotation.set(0, 0, 0.5);
+                bone.rotation.set(0, 0, 0.8);
               }
             }
             
             console.log(`New ${side} ${type} rotation:`, bone.rotation);
             
-            // Force update
+            // Force matrix update
+            bone.updateMatrix();
             bone.updateMatrixWorld(true);
+            
+            // Re-enable auto-updates
+            bone.matrixAutoUpdate = originalMatrixAutoUpdate;
             successCount++;
             
             // Verify the change took effect
