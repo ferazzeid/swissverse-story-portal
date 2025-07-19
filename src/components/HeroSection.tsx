@@ -45,8 +45,7 @@ export const HeroSection = () => {
       />
 
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-        {/* Swiss VRM Character - Left side */}
-        {/* This space is now for the 3D character, no placeholder needed */}
+        {/* Content positioned above the 3D character background */}
 
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">

@@ -30,30 +30,50 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale the model appropriately for hero display
-          vrm.scene.scale.setScalar(2.5);
-          vrm.scene.position.set(0, -2, 0);
-          vrm.scene.rotation.y = Math.PI * 0.1; // Slight angle to show character better
+          // Scale the model appropriately for background display
+          vrm.scene.scale.setScalar(3.5);
+          vrm.scene.position.set(-1, -2.5, 0);
+          vrm.scene.rotation.y = Math.PI * 0.15; // Angled to show character better
           
-          // Set up initial pose (more natural than T-pose)
+          // Set up a confident, welcoming pose
           if (vrm.humanoid) {
-            // Relax arms slightly
+            // Left arm - hand on hip pose
             const leftUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftUpperArm);
-            const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+            const leftLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftLowerArm);
+            const leftHand = vrm.humanoid.getBoneNode(VRMHumanBoneName.LeftHand);
             
             if (leftUpperArm) {
-              leftUpperArm.rotation.z = 0.3;
-              leftUpperArm.rotation.x = -0.1;
+              leftUpperArm.rotation.z = 0.8;
+              leftUpperArm.rotation.x = -0.3;
+              leftUpperArm.rotation.y = 0.2;
             }
-            if (rightUpperArm) {
-              rightUpperArm.rotation.z = -0.3;
-              rightUpperArm.rotation.x = -0.1;
+            if (leftLowerArm) {
+              leftLowerArm.rotation.z = -0.6;
             }
 
-            // Slight head tilt
+            // Right arm - relaxed by side
+            const rightUpperArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightUpperArm);
+            const rightLowerArm = vrm.humanoid.getBoneNode(VRMHumanBoneName.RightLowerArm);
+            
+            if (rightUpperArm) {
+              rightUpperArm.rotation.z = -0.2;
+              rightUpperArm.rotation.x = -0.1;
+            }
+            if (rightLowerArm) {
+              rightLowerArm.rotation.z = 0.3;
+            }
+
+            // Confident head position
             const head = vrm.humanoid.getBoneNode(VRMHumanBoneName.Head);
             if (head) {
-              head.rotation.x = -0.1;
+              head.rotation.x = -0.05;
+              head.rotation.y = 0.1;
+            }
+
+            // Slight hip tilt for dynamic pose
+            const hips = vrm.humanoid.getBoneNode(VRMHumanBoneName.Hips);
+            if (hips) {
+              hips.rotation.z = 0.05;
             }
           }
           
@@ -140,27 +160,32 @@ const SwissVRM = () => {
 export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
   if (isHero) {
     return (
-      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 w-80 h-96 z-20">
-        <Canvas
-          camera={{ position: [0, 0.5, 4], fov: 35 }}
-          style={{ background: 'transparent' }}
-        >
-          <ambientLight intensity={0.8} />
-          <directionalLight 
-            position={[2, 3, 2]} 
-            intensity={1.2}
-            castShadow
-          />
-          <pointLight position={[-2, 2, 2]} intensity={0.5} color="#9333ea" />
-          <SwissVRM />
-          <OrbitControls 
-            enablePan={false}
-            enableZoom={false}
-            maxPolarAngle={Math.PI / 1.8}
-            minPolarAngle={Math.PI / 2.5}
-            target={[0, 0.5, 0]}
-          />
-        </Canvas>
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-full pointer-events-auto">
+          <Canvas
+            camera={{ position: [-2, 1, 6], fov: 45 }}
+            style={{ background: 'transparent', width: '100%', height: '100%' }}
+          >
+            <ambientLight intensity={0.8} />
+            <directionalLight 
+              position={[5, 5, 5]} 
+              intensity={1.2}
+              castShadow
+            />
+            <pointLight position={[-3, 3, 3]} intensity={0.6} color="#9333ea" />
+            <pointLight position={[3, 2, -2]} intensity={0.4} color="#06b6d4" />
+            <SwissVRM />
+            <OrbitControls 
+              enablePan={false}
+              enableZoom={true}
+              minDistance={3}
+              maxDistance={10}
+              maxPolarAngle={Math.PI / 1.5}
+              minPolarAngle={Math.PI / 3}
+              target={[0, 0.5, 0]}
+            />
+          </Canvas>
+        </div>
       </div>
     );
   }
