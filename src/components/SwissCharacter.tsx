@@ -32,10 +32,10 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for far left-side display  
-          vrm.scene.scale.setScalar(3.5);
-          vrm.scene.position.set(-5, -3.5, 0);
-          vrm.scene.rotation.y = Math.PI * 0.25;
+          // Scale and position for far left-side display - much bigger for interaction
+          vrm.scene.scale.setScalar(6);
+          vrm.scene.position.set(-3, -4, 0);
+          vrm.scene.rotation.y = Math.PI * 0.15;
           
           console.log('VRM loaded successfully, now loading animation...');
           
