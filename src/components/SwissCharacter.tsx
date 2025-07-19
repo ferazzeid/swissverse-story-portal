@@ -187,10 +187,10 @@ const SwissVRM = () => {
                 
                 if (leftUpperArm && rightUpperArm) {
                   console.log('Using NORMALIZED bone nodes...');
-                  // GO EVEN FURTHER: Much bigger values for natural hanging arms
-                  leftUpperArm.rotation.set(0.4, 0, 1.0);  // INCREASED to 1.0 - much more hanging down
-                  rightUpperArm.rotation.set(0.4, 0, -1.0); // INCREASED to -1.0 - much more hanging down
-                  console.log('Normalized bones set to hang down much more naturally');
+                  // PUSH EVEN FURTHER: Maximum natural hanging arms
+                  leftUpperArm.rotation.set(0.5, 0, 1.4);  // PUSHED to 1.4 - maximum hanging down
+                  rightUpperArm.rotation.set(0.5, 0, -1.4); // PUSHED to -1.4 - maximum hanging down
+                  console.log('Normalized bones set to maximum natural hanging');
                 } else {
                   console.log('Normalized bones not found, trying direct scene manipulation...');
                   
@@ -199,10 +199,10 @@ const SwissVRM = () => {
                     if (child.name.includes('UpperArm') || child.name.includes('upperarm')) {
                       console.log('Found upper arm in scene:', child.name);
                       if (child.name.includes('L_') || child.name.includes('Left')) {
-                        child.rotation.set(0.4, 0, 1.0);   // GO FURTHER: Much bigger values for hanging
+                        child.rotation.set(0.5, 0, 1.4);   // MAXIMUM: Push for perfect hanging arms
                         child.matrixAutoUpdate = false;
                       } else if (child.name.includes('R_') || child.name.includes('Right')) {
-                        child.rotation.set(0.4, 0, -1.0);  // GO FURTHER: Much bigger values for hanging
+                        child.rotation.set(0.5, 0, -1.4);  // MAXIMUM: Push for perfect hanging arms
                         child.matrixAutoUpdate = false;
                       }
                     }
