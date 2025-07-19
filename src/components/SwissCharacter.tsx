@@ -75,53 +75,9 @@ const SwissVRM = () => {
           
           console.log('Now attempting animation...');
           
-          // Create a simple looking around animation
-          console.log('Creating look around animation...');
-          const mixer = new THREE.AnimationMixer(vrm.scene);
-          mixerRef.current = mixer;
-          
-          // Create custom look animation using VRM bones
-          if (vrm.humanoid) {
-            const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-            const spine = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Spine);
-            
-            if (head) {
-              console.log('Creating head look animation...');
-              // Create keyframe track for head rotation
-              const times = [0, 2, 4, 6, 8];
-              const values = [
-                // Look forward
-                0, 0, 0,
-                // Look right
-                0.3, 0.1, 0,
-                // Look left  
-                -0.3, 0.1, 0,
-                // Look slightly down
-                0, -0.2, 0,
-                // Back to center
-                0, 0, 0
-              ];
-              
-              const track = new THREE.VectorKeyframeTrack(
-                head.name + '.rotation',
-                times,
-                values
-              );
-              
-              const clip = new THREE.AnimationClip('lookAround', 8, [track]);
-              const action = mixer.clipAction(clip);
-              action.setLoop(THREE.LoopRepeat, Infinity);
-              action.play();
-              
-              console.log('✅ Custom look animation created and playing');
-            } else {
-              console.log('❌ No head bone found for animation');
-              mixerRef.current = null;
-            }
-          } else {
-            console.log('❌ No humanoid found for animation');
-            mixerRef.current = null;
-          }
+          // Disable complex animations - use simple manual animation instead
+          console.log('Disabling complex animations, using simple rotation and breathing...');
+          mixerRef.current = null;
           
           setVrm(vrm);
           vrmRef.current = vrm;
@@ -283,36 +239,31 @@ const SwissVRM = () => {
         }
       }
       
-      // Update animation mixer if it exists
-      if (mixerRef.current) {
-        mixerRef.current.update(delta);
-      } else if ((vrmRef.current as any).customIdleAnimation) {
-        // Use custom idle animation if available
-        (vrmRef.current as any).customIdleAnimation();
-      } else {
-        // 360-degree slow clockwise rotation animation with breathing
-        if (vrmRef.current) {
-          vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Clockwise rotation from 240 degrees
-        }
-        
-        // Breathing/pulsating animation - scale and position
-        const breathingIntensity = Math.sin(time * 1.5) * 0.08; // Slightly stronger breathing
-        const breathingScale = 1 + Math.sin(time * 1.5) * 0.02; // Subtle scale pulsing
-        
+      // Force simple animations - ignore mixer completely 
+      // 360-degree slow clockwise rotation animation with breathing
+      if (vrmRef.current) {
+        vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Clockwise rotation from 240 degrees
+      }
+      
+      // Breathing/pulsating animation - scale and position
+      const breathingIntensity = Math.sin(time * 1.5) * 0.08; // Stronger breathing
+      const breathingScale = 1 + Math.sin(time * 1.5) * 0.02; // Subtle scale pulsing
+      
+      if (groupRef.current) {
         groupRef.current.position.y = breathingIntensity; // Up and down movement
         groupRef.current.scale.setScalar(breathingScale); // Subtle size pulsing
         
         // Weight shifting from leg to leg (slower cycle)
         const weightShift = Math.sin(time * 0.4) * 0.015;
         groupRef.current.rotation.z = weightShift;
-        
-        if (vrmRef.current.humanoid) {
-          // Natural head movement - looking around occasionally
-          const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-          if (head) {
-            head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
-            head.rotation.x = Math.sin(time * 0.7) * 0.015;
-          }
+      }
+      
+      // Add some natural head movement without complex animations
+      if (vrmRef.current && vrmRef.current.humanoid) {
+        const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+        if (head) {
+          head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
+          head.rotation.x = Math.sin(time * 0.7) * 0.015;
         }
       }
       
