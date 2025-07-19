@@ -7,8 +7,12 @@ import { SwissCharacter } from "@/components/SwissCharacter";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
-      <HeroSection />
+    <div className="min-h-screen relative">
+      {/* Hero with integrated 3D character */}
+      <div className="relative">
+        <HeroSection />
+        <SwissCharacter isHero={true} />
+      </div>
       <StorySection />
       <ProjectsShowcase />
       <ResourcesGrid />

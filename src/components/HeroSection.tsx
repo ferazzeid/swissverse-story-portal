@@ -45,12 +45,8 @@ export const HeroSection = () => {
       />
 
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-        {/* Swiss Logo/Avatar Placeholder */}
-        <div className="floating mb-8">
-          <div className="w-32 h-32 mx-auto rounded-full card-glow pulse-glow flex items-center justify-center text-6xl font-bold text-gradient">
-            SV
-          </div>
-        </div>
+        {/* Swiss VRM Character - Left side */}
+        {/* This space is now for the 3D character, no placeholder needed */}
 
         {/* Main Title */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
