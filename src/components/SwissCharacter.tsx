@@ -35,9 +35,9 @@ const SwissVRM = () => {
         if (vrm) {
           // Scale and position - moved much further left to not block heading
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-7, -4.5, 0); // MOVED from -3 to -7 (much further left)
-          // Slight left turn for better 3D effect (about 30 degrees)
-          vrm.scene.rotation.y = Math.PI + Math.PI * 0.17;
+          vrm.scene.position.set(-8, -4.5, 0); // MOVED further left to -8
+          // Face the user with slight angle (30 degrees right turn, not away)
+          vrm.scene.rotation.y = Math.PI * 0.17;
           
           console.log('VRM loaded successfully');
           
@@ -75,47 +75,51 @@ const SwissVRM = () => {
           
           console.log('Now attempting animation...');
           
-          // Now try the look animation directly (user requested)
-          try {
-            const animationLoader = new GLTFLoader();
-            console.log('Loading look.glb animation directly...');
-            const animationGltf = await animationLoader.loadAsync(
-              'https://raw.githubusercontent.com/ferazzeid/vrm/main/look.glb'
-            );
+          // Create a simple looking around animation
+          console.log('Creating look around animation...');
+          const mixer = new THREE.AnimationMixer(vrm.scene);
+          mixerRef.current = mixer;
+          
+          // Create custom look animation using VRM bones
+          if (vrm.humanoid) {
+            const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+            const spine = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Spine);
             
-            console.log('Look animation GLB loaded:', animationGltf);
-            console.log('Look animation count:', animationGltf.animations?.length || 0);
-            console.log('Look animations:', animationGltf.animations);
-            
-            if (animationGltf.animations && animationGltf.animations.length > 0) {
-              console.log('Creating animation mixer...');
-              const mixer = new THREE.AnimationMixer(vrm.scene);
-              mixerRef.current = mixer;
-              // Try to apply look animation directly
-              try {
-                console.log('Trying look animation...');
-                const action = mixer.clipAction(animationGltf.animations[0]);
-                action.setLoop(THREE.LoopRepeat, Infinity);
-                action.clampWhenFinished = false;
-                action.weight = 1;
-                action.play();
-                
-                console.log('✅ Look animation applied successfully!');
-                console.log('Look animation duration:', animationGltf.animations[0].duration);
-              } catch (directError) {
-                console.log('Look animation failed, using manual pose...');
-                console.log('Look error:', directError.message);
-                // Disable mixer since animation failed
-                mixerRef.current = null;
-              }
+            if (head) {
+              console.log('Creating head look animation...');
+              // Create keyframe track for head rotation
+              const times = [0, 2, 4, 6, 8];
+              const values = [
+                // Look forward
+                0, 0, 0,
+                // Look right
+                0.3, 0.1, 0,
+                // Look left  
+                -0.3, 0.1, 0,
+                // Look slightly down
+                0, -0.2, 0,
+                // Back to center
+                0, 0, 0
+              ];
+              
+              const track = new THREE.VectorKeyframeTrack(
+                head.name + '.rotation',
+                times,
+                values
+              );
+              
+              const clip = new THREE.AnimationClip('lookAround', 8, [track]);
+              const action = mixer.clipAction(clip);
+              action.setLoop(THREE.LoopRepeat, Infinity);
+              action.play();
+              
+              console.log('✅ Custom look animation created and playing');
             } else {
-              console.warn('❌ No animations found in look.glb - using manual pose');
+              console.log('❌ No head bone found for animation');
               mixerRef.current = null;
             }
-          } catch (animError) {
-            console.error('❌ Failed to load any animations:', animError);
-            console.error('Animation error details:', animError.message);
-            console.log('Using manual pose only...');
+          } else {
+            console.log('❌ No humanoid found for animation');
             mixerRef.current = null;
           }
           
@@ -377,7 +381,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={20} // Increased maximum distance  
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-7, 0, 0]} // UPDATED target to match new avatar position (-7)
+              target={[-8, 0, 0]} // UPDATED target to match new avatar position (-8)
             />
           </Canvas>
         </div>
