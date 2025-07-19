@@ -33,9 +33,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position - positioned further left in 3D space
+          // Scale and position - positioned much further left in 3D space
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-6, -4.5, 0); // Further left at -6
+          vrm.scene.position.set(-10, -4.5, 0); // Much further left at -10
           // Start facing forward - rotation will be animated
           vrm.scene.rotation.y = 0;
           
@@ -387,7 +387,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={16}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-6, 0, 0]} // Follow the avatar at -6 position
+              target={[-10, 0, 0]} // Follow the avatar at -10 position
             />
           </Canvas>
         </div>
