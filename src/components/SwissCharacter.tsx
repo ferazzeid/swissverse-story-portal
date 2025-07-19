@@ -32,10 +32,11 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position for far left-side display - much bigger for interaction
+          // Scale and position for display - much bigger for interaction
           vrm.scene.scale.setScalar(6);
           vrm.scene.position.set(-3, -4, 0);
-          vrm.scene.rotation.y = Math.PI * 0.15;
+          // Rotate to face forward (180 degrees from back view)
+          vrm.scene.rotation.y = Math.PI;
           
           console.log('VRM loaded successfully, now loading animation...');
           
@@ -57,16 +58,23 @@ const SwissVRM = () => {
               const mixer = new THREE.AnimationMixer(vrm.scene);
               mixerRef.current = mixer;
               
-              // Apply the first animation (idle)
-              console.log('Creating and playing animation action...');
-              const action = mixer.clipAction(animationGltf.animations[0]);
-              action.setLoop(THREE.LoopRepeat, Infinity);
-              action.clampWhenFinished = false;
-              action.play();
-              
-              console.log('✅ Idle animation applied and playing successfully!');
-              console.log('Animation duration:', animationGltf.animations[0].duration);
-              console.log('Animation name:', animationGltf.animations[0].name);
+              // Try to apply the animation, but handle bone mismatches
+              try {
+                console.log('Creating and playing animation action...');
+                const action = mixer.clipAction(animationGltf.animations[0]);
+                action.setLoop(THREE.LoopRepeat, Infinity);
+                action.clampWhenFinished = false;
+                action.play();
+                
+                console.log('✅ Animation started successfully!');
+                console.log('Animation duration:', animationGltf.animations[0].duration);
+                console.log('Animation name:', animationGltf.animations[0].name);
+              } catch (animPlayError) {
+                console.warn('❌ Animation incompatible with VRM bones - using manual pose');
+                console.warn('Animation error:', animPlayError);
+                setManualPose(vrm);
+                mixerRef.current = null; // Disable mixer since animation failed
+              }
             } else {
               console.warn('❌ No animations found in idle.glb - using manual pose');
               setManualPose(vrm);

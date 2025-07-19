@@ -17,7 +17,10 @@ const Index = () => {
       <ProjectsShowcase />
       <ResourcesGrid />
       <Footer />
-      <SwissCharacter />
+      {/* Small character in bottom-right corner - only show on larger screens */}
+      <div className="hidden lg:block">
+        <SwissCharacter />
+      </div>
     </div>
   );
 };
