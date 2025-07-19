@@ -33,9 +33,9 @@ const SwissVRM = () => {
         const vrm = gltf.userData.vrm as VRM;
         
         if (vrm) {
-          // Scale and position - positioned much further left in 3D space
+          // Scale and position - back to reasonable 3D position for good rotation
           vrm.scene.scale.setScalar(5);
-          vrm.scene.position.set(-10, -4.5, 0); // Much further left at -10
+          vrm.scene.position.set(-4, -4.5, 0); // Back to -4 for proper rotation center
           // Start facing forward - rotation will be animated
           vrm.scene.rotation.y = 0;
           
@@ -359,8 +359,8 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
         className="absolute inset-0 z-0 pointer-events-none select-none"
         style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
       >
-        {/* Position canvas to show avatar on left-center area */}
-        <div className="absolute left-0 top-0 w-3/4 h-full pointer-events-auto">
+        {/* Position canvas to show avatar on left side - shift the whole canvas left */}
+        <div className="absolute -left-32 top-0 w-1/2 h-full pointer-events-auto">
           <Canvas
             camera={{ position: [0, 2, 12], fov: 45 }} // Camera looking straight ahead
             style={{ 
@@ -387,7 +387,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={16}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-10, 0, 0]} // Follow the avatar at -10 position
+              target={[-4, 0, 0]} // Back to -4 to match avatar position
             />
           </Canvas>
         </div>
