@@ -16,26 +16,15 @@ const SwissVRM = () => {
         setLoading(true);
         setError(null);
 
-        // Create a GLTF loader with VRM plugin
-        const loader = new GLTFLoader();
-        loader.register((parser) => new VRMLoaderPlugin(parser));
-
-        // Load the VRM from Google Drive
-        const gltf = await loader.loadAsync(
-          'https://drive.google.com/uc?export=download&id=1k-4y0sAYHav46Ga17lXomSRyJXv7863u'
-        );
-
-        const vrm = gltf.userData.vrm as VRM;
+        // For now, let's create a placeholder since Google Drive has CORS issues
+        // We'll need to either:
+        // 1. Host the VRM on a CORS-friendly server
+        // 2. Use a proxy service
+        // 3. Convert to a different format
         
-        if (vrm) {
-          // Scale the model appropriately
-          vrm.scene.scale.setScalar(1);
-          vrm.scene.position.set(0, -1, 0);
-          
-          setVrm(vrm);
-          vrmRef.current = vrm;
-          console.log('VRM loaded successfully:', vrm);
-        }
+        console.log('VRM loading attempted - Google Drive CORS blocked');
+        setError('Google Drive CORS blocked - need alternative hosting');
+        
       } catch (err) {
         console.error('Failed to load VRM:', err);
         setError('Failed to load Swiss character');
