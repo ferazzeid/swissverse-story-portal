@@ -14,6 +14,7 @@ const SwissVRM = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('🚀 SwissVRM useEffect started - component is mounting');
     const loadVRMAndAnimation = async () => {
       try {
         setLoading(true);
