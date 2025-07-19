@@ -187,10 +187,10 @@ const SwissVRM = () => {
                 
                 if (leftUpperArm && rightUpperArm) {
                   console.log('Using NORMALIZED bone nodes...');
-                  // CORRECT DIRECTION: INCREASE values to make arms hang DOWN more
-                  leftUpperArm.rotation.set(0.3, 0, 0.6);  // INCREASED from 0.3 to 0.6 - arms hang down more
-                  rightUpperArm.rotation.set(0.3, 0, -0.6); // INCREASED from -0.3 to -0.6 - arms hang down more
-                  console.log('Normalized bones set to hang down naturally');
+                  // GO EVEN FURTHER: Much bigger values for natural hanging arms
+                  leftUpperArm.rotation.set(0.4, 0, 1.0);  // INCREASED to 1.0 - much more hanging down
+                  rightUpperArm.rotation.set(0.4, 0, -1.0); // INCREASED to -1.0 - much more hanging down
+                  console.log('Normalized bones set to hang down much more naturally');
                 } else {
                   console.log('Normalized bones not found, trying direct scene manipulation...');
                   
@@ -199,10 +199,10 @@ const SwissVRM = () => {
                     if (child.name.includes('UpperArm') || child.name.includes('upperarm')) {
                       console.log('Found upper arm in scene:', child.name);
                       if (child.name.includes('L_') || child.name.includes('Left')) {
-                        child.rotation.set(0.3, 0, 0.6);   // INCREASED: Make arms hang down more
+                        child.rotation.set(0.4, 0, 1.0);   // GO FURTHER: Much bigger values for hanging
                         child.matrixAutoUpdate = false;
                       } else if (child.name.includes('R_') || child.name.includes('Right')) {
-                        child.rotation.set(0.3, 0, -0.6);  // INCREASED: Make arms hang down more
+                        child.rotation.set(0.4, 0, -1.0);  // GO FURTHER: Much bigger values for hanging
                         child.matrixAutoUpdate = false;
                       }
                     }
