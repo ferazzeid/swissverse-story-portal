@@ -11,6 +11,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { HomePageManager } from "@/components/admin/HomePageManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { YouTubeManager } from "@/components/admin/YouTubeManager";
+import { TimelineManager } from "@/components/admin/TimelineManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -164,10 +165,7 @@ const Admin = () => {
             </TabsContent>
             
             <TabsContent value="timeline">
-              <div className="text-center py-8">
-                <h2 className="text-2xl font-bold mb-4">Timeline Management</h2>
-                <p className="text-muted-foreground">Timeline management coming soon...</p>
-              </div>
+              <TimelineManager />
             </TabsContent>
             
             <TabsContent value="youtube">

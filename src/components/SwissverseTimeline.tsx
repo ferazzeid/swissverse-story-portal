@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Rocket, Coins, Globe, Cpu, Users, Mountain } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import timeline images
 import laptopImage from "@/assets/timeline-laptop.jpg";
@@ -8,15 +9,26 @@ import circuitImage from "@/assets/timeline-circuit.jpg";
 import matrixImage from "@/assets/timeline-matrix.jpg";
 import communityImage from "@/assets/timeline-community.jpg";
 
+// Import all potential icons
+import {
+  Calendar, Rocket, Coins, Globe, Cpu, Users, Mountain,
+  Sparkles, Zap, Eye, Heart, Star, Trophy, Target, Lightbulb,
+  Code, Database, Shield, Lock, Key, Wifi, Cloud, Server
+} from "lucide-react";
+
 interface TimelineMoment {
   id: string;
+  year: number;
+  year_title: string;
   month: string;
   title: string;
-  icon: React.ComponentType<any>;
   content: string;
   highlight: string;
-  image?: string;
-  gradient: string;
+  icon_name: string;
+  image_url: string | null;
+  gradient_class: string;
+  display_order: number;
+  is_active: boolean;
 }
 
 interface TimelineYear {
@@ -25,20 +37,52 @@ interface TimelineYear {
   moments: TimelineMoment[];
 }
 
-const timelineData: TimelineYear[] = [
+// Icon mapping
+const iconMap: { [key: string]: React.ComponentType<any> } = {
+  calendar: Calendar,
+  rocket: Rocket,
+  coins: Coins,
+  globe: Globe,
+  cpu: Cpu,
+  users: Users,
+  mountain: Mountain,
+  sparkles: Sparkles,
+  zap: Zap,
+  eye: Eye,
+  heart: Heart,
+  star: Star,
+  trophy: Trophy,
+  target: Target,
+  lightbulb: Lightbulb,
+  code: Code,
+  database: Database,
+  shield: Shield,
+  lock: Lock,
+  key: Key,
+  wifi: Wifi,
+  cloud: Cloud,
+  server: Server
+};
+
+// Fallback data - same as original timeline
+const fallbackTimelineData: TimelineYear[] = [
   {
     year: 2020,
     title: "The Genesis Era",
     moments: [
       {
         id: "genesis-march",
+        year: 2020,
+        year_title: "The Genesis Era",
         month: "March",
         title: "Digital Birth",
-        icon: Rocket,
         content: "In March 2020, as the world faced unprecedented challenges, the vision for SWISSVERSE began to take shape. A digital native was born with the mission to bridge traditional systems and revolutionary Web3 technologies.",
         highlight: "Project Genesis",
-        image: laptopImage,
-        gradient: "from-purple-500 to-pink-500"
+        icon_name: "rocket",
+        image_url: laptopImage,
+        gradient_class: "from-purple-500 to-pink-500",
+        display_order: 1,
+        is_active: true
       }
     ]
   },
@@ -48,22 +92,31 @@ const timelineData: TimelineYear[] = [
     moments: [
       {
         id: "foundation-tech",
+        year: 2021,
+        year_title: "Foundation Building",
         month: "Early 2021",
         title: "Technology Foundation",
-        icon: Cpu,
         content: "SWISS began developing the core technological infrastructure that would later define the Swissverse. Focus on blockchain integration and decentralized systems architecture.",
         highlight: "Tech Development",
-        image: circuitImage,
-        gradient: "from-cyan-500 to-purple-500"
+        icon_name: "cpu",
+        image_url: circuitImage,
+        gradient_class: "from-cyan-500 to-purple-500",
+        display_order: 1,
+        is_active: true
       },
       {
         id: "foundation-vision",
+        year: 2021,
+        year_title: "Foundation Building",
         month: "Mid 2021",
         title: "Vision Crystallization",
-        icon: Globe,
         content: "The metaverse vision evolved throughout 2021, focusing on creating interconnected digital experiences where NFTs become functional assets that empower creators.",
         highlight: "Vision Development",
-        gradient: "from-blue-500 to-cyan-500"
+        icon_name: "globe",
+        image_url: null,
+        gradient_class: "from-blue-500 to-cyan-500",
+        display_order: 2,
+        is_active: true
       }
     ]
   },
@@ -73,23 +126,31 @@ const timelineData: TimelineYear[] = [
     moments: [
       {
         id: "metaverse-concept",
+        year: 2022,
+        year_title: "Metaverse Evolution",
         month: "Early 2022",
         title: "Metaverse Conceptualization",
-        icon: Calendar,
         content: "SWISS expanded the Swissverse concept to include immersive digital experiences that bridge virtual and physical realities, laying groundwork for the hyperfy revolution.",
         highlight: "Metaverse Architect",
-        image: matrixImage,
-        gradient: "from-green-500 to-cyan-500"
+        icon_name: "calendar",
+        image_url: matrixImage,
+        gradient_class: "from-green-500 to-cyan-500",
+        display_order: 1,
+        is_active: true
       },
       {
         id: "community-building",
+        year: 2022,
+        year_title: "Metaverse Evolution",
         month: "Late 2022",
         title: "Community Formation",
-        icon: Users,
         content: "The first Swissverse community began to form, bringing together creators, developers, and visionaries who shared the dream of decentralized digital experiences.",
         highlight: "Community Builder",
-        image: communityImage,
-        gradient: "from-emerald-500 to-green-500"
+        icon_name: "users",
+        image_url: communityImage,
+        gradient_class: "from-emerald-500 to-green-500",
+        display_order: 2,
+        is_active: true
       }
     ]
   },
@@ -99,27 +160,110 @@ const timelineData: TimelineYear[] = [
     moments: [
       {
         id: "hyperfy-launch",
+        year: 2023,
+        year_title: "hyperfy Revolution",
         month: "Early 2023",
         title: "hyperfy Era Begins",
-        icon: Coins,
         content: "2023 ushered in the hyperfy era. SWISS pioneered new approaches to decentralized experiences, creating innovative protocols that make Web3 accessible to everyone.",
         highlight: "hyperfy Pioneer",
-        gradient: "from-orange-500 to-pink-500"
+        icon_name: "coins",
+        image_url: null,
+        gradient_class: "from-orange-500 to-pink-500",
+        display_order: 1,
+        is_active: true
       },
       {
         id: "hyperfy-evolution",
+        year: 2023,
+        year_title: "hyperfy Revolution",
         month: "Mid 2023",
         title: "Platform Evolution",
-        icon: Mountain,
         content: "The hyperfy platform evolved to include advanced features for creators and builders, establishing SWISS as a leading figure in the metaverse revolution.",
         highlight: "Platform Leader",
-        gradient: "from-red-500 to-orange-500"
+        icon_name: "mountain",
+        image_url: null,
+        gradient_class: "from-red-500 to-orange-500",
+        display_order: 2,
+        is_active: true
       }
     ]
   }
 ];
 
 export const SwissverseTimeline = () => {
+  const [timelineData, setTimelineData] = useState<TimelineYear[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTimelineData();
+  }, []);
+
+  const fetchTimelineData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('timeline_content')
+        .select('*')
+        .eq('is_active', true)
+        .order('year', { ascending: true })
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        // Group moments by year
+        const groupedData = groupMomentsByYear(data);
+        setTimelineData(groupedData);
+      } else {
+        // Use fallback data if no database content
+        setTimelineData(fallbackTimelineData);
+      }
+    } catch (error) {
+      console.error('Error fetching timeline data:', error);
+      // Use fallback data on error
+      setTimelineData(fallbackTimelineData);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const groupMomentsByYear = (moments: TimelineMoment[]): TimelineYear[] => {
+    const groups: { [year: number]: TimelineYear } = {};
+    
+    moments.forEach(moment => {
+      if (!groups[moment.year]) {
+        groups[moment.year] = {
+          year: moment.year,
+          title: moment.year_title,
+          moments: []
+        };
+      }
+      groups[moment.year].moments.push(moment);
+    });
+    
+    return Object.values(groups).sort((a, b) => a.year - b.year);
+  };
+
+  const getIconComponent = (iconName: string) => {
+    return iconMap[iconName] || Calendar;
+  };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="text-white uppercase">SWISSVERSE</span>{" "}
+            <span className="text-gradient">Story</span>
+          </h2>
+          <div className="animate-pulse">
+            <div className="h-6 bg-muted rounded w-96 mx-auto mb-4"></div>
+            <div className="h-4 bg-muted rounded w-64 mx-auto"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 px-4 max-w-6xl mx-auto">
       <div className="text-center mb-16">
@@ -162,81 +306,87 @@ export const SwissverseTimeline = () => {
 
               {/* Year Moments */}
               <div className="space-y-16">
-                {yearData.moments.map((moment, momentIndex) => (
-                  <div
-                    key={moment.id}
-                    className="relative"
-                  >
-                    {/* Content Card with proper left/right positioning */}
-                    <div className={`relative w-full max-w-md ${
-                      momentIndex % 2 === 0 
-                        ? "mx-auto md:mr-auto md:ml-0" 
-                        : "mx-auto md:ml-auto md:mr-0"
-                    }`}>
-                      <Card className="card-glow overflow-hidden animate-fade-in">
-                        {/* Optional Image - extends to edges with straight bottom */}
-                        {moment.image && (
-                          <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
-                            <img
-                              src={moment.image}
-                              alt={moment.title}
-                              className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                            <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
-                              <div className="text-sm font-medium text-white">{moment.month}</div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className={`p-6 ${moment.image ? 'pt-4' : ''}`}>
-                          <div className="flex items-start gap-4 mb-4">
-                            <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient} animate-scale-in`}>
-                              <moment.icon size={24} className="text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="text-xl font-bold">{moment.title}</h4>
-                                <Badge variant="outline" className="text-xs">
-                                  {moment.highlight}
-                                </Badge>
-                              </div>
-                              {!moment.image && (
-                                <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-muted-foreground leading-relaxed">
-                            {moment.content}
-                          </p>
-                        </div>
-                      </Card>
-
-                      {/* Timeline Connector - Simplified and properly positioned */}
-                      <div className={`absolute top-8 z-20 ${
+                {yearData.moments.map((moment, momentIndex) => {
+                  const IconComponent = getIconComponent(moment.icon_name);
+                  return (
+                    <div
+                      key={moment.id}
+                      className="relative"
+                    >
+                      {/* Content Card with proper left/right positioning */}
+                      <div className={`relative w-full max-w-md ${
                         momentIndex % 2 === 0 
-                          ? "md:-right-6 right-0 md:left-auto left-1/2 md:transform-none transform -translate-x-1/2" 
-                          : "md:-left-6 left-0 md:right-auto right-1/2 md:transform-none transform translate-x-1/2"
+                          ? "mx-auto md:mr-auto md:ml-0" 
+                          : "mx-auto md:ml-auto md:mr-0"
                       }`}>
-                        <div className="flex items-center">
-                          {/* Connector line to center */}
-                          <div className={`h-0.5 bg-gradient-to-r ${moment.gradient} ${
-                            momentIndex % 2 === 0 
-                              ? "w-6 md:order-1 order-2" 
-                              : "w-6 md:order-2 order-1"
-                          }`} />
+                        <Card className="card-glow overflow-hidden animate-fade-in">
+                          {/* Optional Image - extends to edges with straight bottom */}
+                          {moment.image_url && (
+                            <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
+                              <img
+                                src={moment.image_url}
+                                alt={moment.title}
+                                className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                              <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
+                                <div className="text-sm font-medium text-white">{moment.month}</div>
+                              </div>
+                            </div>
+                          )}
                           
-                          {/* Center dot */}
-                          <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background ${
-                            momentIndex % 2 === 0 
-                              ? "md:order-2 order-1" 
-                              : "md:order-1 order-2"
-                          }`} />
+                          <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
+                            <div className="flex items-start gap-4 mb-4">
+                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} animate-scale-in`}>
+                                <IconComponent size={24} className="text-white" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h4 className="text-xl font-bold">{moment.title}</h4>
+                                  <Badge variant="outline" className="text-xs">
+                                    {moment.highlight}
+                                  </Badge>
+                                </div>
+                                {!moment.image_url && (
+                                  <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-muted-foreground leading-relaxed">
+                              {moment.content}
+                            </p>
+                          </div>
+                        </Card>
+
+                        {/* Timeline Connector - Simplified and properly positioned */}
+                        <div className={`absolute top-8 z-20 ${
+                          momentIndex % 2 === 0 
+                            ? "md:-right-6 right-0 md:left-auto left-1/2 md:transform-none transform -translate-x-1/2" 
+                            : "md:-left-6 left-0 md:right-auto right-1/2 md:transform-none transform translate-x-1/2"
+                        }`}>
+                          <div className="flex items-center">
+                            {/* Connector line to center */}
+                            <div className={`h-0.5 bg-gradient-to-r ${moment.gradient_class} ${
+                              momentIndex % 2 === 0 
+                                ? "w-6 md:order-1 order-2" 
+                                : "w-6 md:order-2 order-1"
+                            }`} />
+                            
+                            {/* Center dot */}
+                            <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient_class} border-4 border-background ${
+                              momentIndex % 2 === 0 
+                                ? "md:order-2 order-1" 
+                                : "md:order-1 order-2"
+                            }`} />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
