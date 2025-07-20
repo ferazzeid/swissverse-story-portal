@@ -89,7 +89,8 @@ export const HeroSection = () => {
 
         {/* Main Title */}
         <div className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
-          {renderTitle('hero_title', 'Welcome to SWISSVERSE', 'text-white animate-pulse')}
+          <span className="text-gradient">Welcome to </span>
+          <span className="text-white animate-pulse">SWISSVERSE</span>
         </div>
 
         {/* Subtitle */}
