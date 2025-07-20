@@ -68,13 +68,40 @@ export const MetaverseGallery = () => {
     }
   }, [galleryImages.length]);
 
+  if (isLoading) {
+    return (
+      <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
+            Loading Gallery...
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (galleryImages.length === 0) {
+    return (
+      <section className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-background/90">
+        <div className="text-center text-white">
+          <div className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
+            Metaverse Gallery
+          </div>
+          <p className="text-xl text-muted-foreground">
+            No images available at the moment
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative w-full h-screen overflow-hidden">
       {/* Image Container */}
       <div className="relative w-full h-full">
         {galleryImages.map((image, index) => (
           <div
-            key={index}
+            key={image.id}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
               index === currentIndex
                 ? "opacity-100 scale-100"
@@ -85,6 +112,10 @@ export const MetaverseGallery = () => {
               src={image.image_url}
               alt={image.alt_text}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to a default image if loading fails
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1920&h=1080&fit=crop';
+              }}
             />
             {/* Overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
@@ -130,6 +161,11 @@ export const MetaverseGallery = () => {
           <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient animate-fade-in">
             Metaverse Gallery
           </h2>
+          {galleryImages[currentIndex]?.description && (
+            <p className="text-lg md:text-xl text-muted-foreground mt-4 animate-fade-in">
+              {galleryImages[currentIndex].description}
+            </p>
+          )}
         </div>
       </div>
 
