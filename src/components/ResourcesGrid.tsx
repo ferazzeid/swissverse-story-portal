@@ -112,7 +112,7 @@ export const ResourcesGrid = () => {
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
-          Swiss Tools & Resources
+          Tools & Resources
         </h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Curated collection of tools and platforms that power the Swissverse ecosystem
@@ -182,25 +182,6 @@ export const ResourcesGrid = () => {
         ))}
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-        {[
-          { label: "Tools Curated", value: "50+", icon: Code },
-          { label: "AI Platforms", value: "15+", icon: Brain },
-          { label: "3D Resources", value: "20+", icon: Box },
-          { label: "Active Users", value: "1K+", icon: Zap },
-        ].map((stat, index) => (
-          <div 
-            key={index} 
-            className="text-center p-6 card-glow"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            <stat.icon size={32} className="mx-auto text-primary mb-2" />
-            <div className="text-2xl font-bold text-gradient">{stat.value}</div>
-            <div className="text-sm text-muted-foreground">{stat.label}</div>
-          </div>
-        ))}
-      </div>
     </section>
   );
 };

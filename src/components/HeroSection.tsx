@@ -63,7 +63,7 @@ export const HeroSection = () => {
         <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
           Where <span className="text-white uppercase">SWISS</span> helps build the future of{" "}
           <span className="text-gradient">Web3</span>, <span className="text-gradient">NFTs</span>, and{" "}
-          <span className="text-gradient">hyperfy revolution</span>
+          <span className="text-gradient">Metaverse</span>
         </p>
 
         {/* Feature Pills */}

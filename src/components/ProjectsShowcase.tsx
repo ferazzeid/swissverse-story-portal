@@ -18,48 +18,26 @@ interface Project {
 
 const projects: Project[] = [
   {
-    id: "hyperfi",
-    name: "HyperFi Protocol",
-    category: "DeFi",
-    description: "Revolutionary DeFi protocol offering high-yield farming and innovative liquidity solutions with Swiss-engineered security.",
-    features: ["Auto-compounding", "Cross-chain", "DAO Governance", "Yield Optimization"],
-    status: "Live",
-    url: "https://hyperfi.swiss",
-    icon: TrendingUp,
-    gradient: "from-green-500 to-cyan-500"
-  },
-  {
-    id: "central",
-    name: "Central Hub",
-    category: "Tools",
-    description: "The central command center for managing all your Web3 assets, DeFi positions, and metaverse experiences in one place.",
-    features: ["Portfolio Tracking", "Multi-chain Support", "Analytics", "DeFi Dashboard"],
-    status: "Beta",
-    url: "https://central.swiss",
-    icon: Shield,
-    gradient: "from-purple-500 to-pink-500"
-  },
-  {
-    id: "nft-studio",
-    name: "Swiss NFT Studio",
-    category: "NFT",
-    description: "Create, mint, and trade NFTs with advanced utility features. Build functional digital assets that work across the metaverse.",
-    features: ["AI Generation", "Utility Programming", "Cross-platform", "Royalty Management"],
-    status: "Coming Soon",
-    url: "#",
-    icon: Coins,
-    gradient: "from-orange-500 to-red-500"
-  },
-  {
-    id: "metaverse",
-    name: "Swissverse World",
+    id: "hyperfy",
+    name: "Hyperfy",
     category: "Metaverse",
-    description: "Immersive 3D metaverse experience where Swiss characters interact, build, and create in a fully decentralized virtual world.",
-    features: ["VR/AR Ready", "NFT Integration", "Virtual Economy", "Social Features"],
-    status: "Beta",
+    description: "Immersive 3D metaverse platform where users can build, create, and interact in virtual worlds with seamless VR/AR integration.",
+    features: ["3D World Building", "VR/AR Ready", "Real-time Collaboration", "Virtual Economy"],
+    status: "Live",
     url: "https://world.swissverse.org",
     icon: Globe,
     gradient: "from-blue-500 to-purple-500"
+  },
+  {
+    id: "decentraland",
+    name: "Decentraland",
+    category: "Metaverse",
+    description: "Virtual social world owned by its users. Create, explore, and trade in the first-ever virtual world owned by its users.",
+    features: ["User Ownership", "Virtual Land", "NFT Integration", "Social Hub"],
+    status: "Live",
+    url: "https://decentraland.org/",
+    icon: Globe,
+    gradient: "from-green-500 to-cyan-500"
   }
 ];
 
@@ -85,7 +63,7 @@ export const ProjectsShowcase = () => {
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
-          Swiss Projects
+          Metaverse Projects
         </h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Discover the innovative projects building the future of Web3, DeFi, and the metaverse

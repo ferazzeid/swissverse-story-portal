@@ -4,6 +4,7 @@ import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
 import { SwissCharacter } from "@/components/SwissCharacter";
+import { StorySection, NFTStorySection } from "@/components/StorySection";
 
 const Index = () => {
   return (
@@ -14,6 +15,8 @@ const Index = () => {
         <SwissCharacter isHero={true} />
       </div>
       <SwissverseTimeline />
+      <StorySection />
+      <NFTStorySection />
       <ProjectsShowcase />
       <ResourcesGrid />
       <Footer />

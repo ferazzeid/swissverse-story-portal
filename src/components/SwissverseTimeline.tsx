@@ -144,15 +144,15 @@ export const SwissverseTimeline = () => {
               <div className="flex items-center justify-center mb-12">
                 <div className="relative">
                   {/* Year Node */}
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-orange-500 flex items-center justify-center card-glow shadow-2xl animate-pulse">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-orange-500 flex items-center justify-center card-glow shadow-2xl animate-pulse z-10 relative">
                     <div className="text-2xl font-bold text-white">
                       {yearData.year}
                     </div>
                   </div>
                   
-                  {/* Year Title */}
-                  <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 text-center">
-                    <h3 className="text-xl font-bold text-gradient whitespace-nowrap">
+                  {/* Year Title - positioned to the side */}
+                  <div className="absolute left-32 top-1/2 transform -translate-y-1/2">
+                    <h3 className="text-xl font-bold text-gradient whitespace-nowrap bg-background px-3 py-1 rounded-lg">
                       {yearData.title}
                     </h3>
                   </div>
