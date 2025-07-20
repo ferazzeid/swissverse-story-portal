@@ -144,7 +144,7 @@ export const SwissverseTimeline = () => {
               <div className="flex items-center justify-center mb-12">
                 <div className="relative">
                   {/* Year Node */}
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-orange-500 flex items-center justify-center card-glow shadow-2xl animate-pulse z-10 relative">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-orange-500 flex items-center justify-center card-glow shadow-2xl z-10 relative">
                     <div className="text-2xl font-bold text-white">
                       {yearData.year}
                     </div>
@@ -157,8 +157,6 @@ export const SwissverseTimeline = () => {
                     </h3>
                   </div>
 
-                  {/* Breathing Animation */}
-                  <div className="absolute inset-0 w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-orange-500 opacity-30 animate-pulse" />
                 </div>
               </div>
 
@@ -198,8 +196,8 @@ export const SwissverseTimeline = () => {
                     <div className="relative">
                       <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background`} />
                       <div className={`absolute top-1/2 ${
-                        momentIndex % 2 === 0 ? "left-4" : "right-4"
-                      } w-8 h-0.5 bg-gradient-to-r ${moment.gradient} transform -translate-y-1/2`} />
+                        momentIndex % 2 === 0 ? "left-4 w-8" : "right-4 w-8 -translate-x-8"
+                      } h-0.5 bg-gradient-to-r ${moment.gradient} transform -translate-y-1/2`} />
                     </div>
 
                     {/* Image Side */}
@@ -226,7 +224,7 @@ export const SwissverseTimeline = () => {
         </div>
 
         {/* Future Indicator */}
-        <div className="flex items-center justify-center mt-16">
+        <div className="flex items-center justify-center mt-24 relative z-20">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
             <Mountain size={24} className="text-muted-foreground" />
           </div>

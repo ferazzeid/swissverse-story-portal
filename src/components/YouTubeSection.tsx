@@ -124,7 +124,7 @@ export const YouTubeSection = () => {
       {/* Section Header */}
       <div className="text-center mb-16 relative z-10">
         <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
-          Swiss Content Hub
+          YouTube
         </h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Dive deep into Web3, NFTs, and metaverse development with our latest video content

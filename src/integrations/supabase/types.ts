@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      gallery_images: {
+        Row: {
+          alt_text: string
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          image_url: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -35,6 +71,57 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      timeline_content: {
+        Row: {
+          content: string
+          created_at: string
+          display_order: number
+          gradient_class: string
+          highlight: string
+          icon_name: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          month: string
+          title: string
+          updated_at: string
+          year: number
+          year_title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          display_order?: number
+          gradient_class: string
+          highlight: string
+          icon_name: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          month: string
+          title: string
+          updated_at?: string
+          year: number
+          year_title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          display_order?: number
+          gradient_class?: string
+          highlight?: string
+          icon_name?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          month?: string
+          title?: string
+          updated_at?: string
+          year?: number
+          year_title?: string
         }
         Relationships: []
       }

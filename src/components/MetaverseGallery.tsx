@@ -92,9 +92,6 @@ export const MetaverseGallery = () => {
           <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient animate-fade-in">
             Metaverse Gallery
           </h2>
-          <p className="text-xl md:text-2xl opacity-90 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-            Explore the infinite possibilities of digital worlds
-          </p>
         </div>
       </div>
 
