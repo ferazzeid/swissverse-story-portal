@@ -134,8 +134,8 @@ export const SwissverseTimeline = () => {
 
       {/* Vertical Timeline */}
       <div className="relative">
-        {/* Central Timeline Line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 via-cyan-500 via-green-500 to-orange-500 transform -translate-x-1/2 rounded-full" />
+        {/* Central Timeline Line - stops before the "To be continued" section */}
+        <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-purple-500 via-cyan-500 via-green-500 to-orange-500 transform -translate-x-1/2 rounded-full" style={{ height: 'calc(100% - 120px)' }} />
 
         <div className="space-y-24">
           {timelineData.map((yearData, yearIndex) => (
@@ -196,7 +196,7 @@ export const SwissverseTimeline = () => {
                     <div className="relative">
                       <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background`} />
                       <div className={`absolute top-1/2 ${
-                        momentIndex % 2 === 0 ? "left-4 w-8" : "right-4 w-8 -translate-x-8"
+                        momentIndex % 2 === 0 ? "-left-8 w-8" : "-right-8 w-8"
                       } h-0.5 bg-gradient-to-r ${moment.gradient} transform -translate-y-1/2`} />
                     </div>
 
