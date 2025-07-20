@@ -1,6 +1,6 @@
 import { HeroSection } from "@/components/HeroSection";
 import { SwissverseTimeline } from "@/components/SwissverseTimeline";
-import { ProjectsShowcase } from "@/components/ProjectsShowcase";
+
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
 import { SwissCharacter } from "@/components/SwissCharacter";
@@ -20,7 +20,6 @@ const Index = () => {
       </div>
       <SwissverseTimeline />
       <NFTStorySection />
-      <ProjectsShowcase />
       <YouTubeSection />
       <ResourcesGrid />
       <Footer />
