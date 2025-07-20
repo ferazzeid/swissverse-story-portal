@@ -54,6 +54,21 @@ export const HeroSection = () => {
   };
 
   return (
+    <>
+      <style>
+        {`
+          @keyframes gentle-glow {
+            0%, 100% {
+              opacity: 0.85;
+              filter: brightness(0.9);
+            }
+            50% {
+              opacity: 1;
+              filter: brightness(1.1);
+            }
+          }
+        `}
+      </style>
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden select-none"
              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
       {/* Animated Background */}
@@ -91,7 +106,7 @@ export const HeroSection = () => {
         <div className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
           <span className="text-gradient">Welcome to </span>
           <span 
-            className="text-white animate-pulse"
+            className="text-white"
             style={{
               textShadow: `
                 0 0 10px rgba(255, 255, 255, 0.8),
@@ -100,12 +115,14 @@ export const HeroSection = () => {
                 0 0 40px rgba(138, 43, 226, 0.8),
                 0 0 70px rgba(138, 43, 226, 0.6),
                 0 0 80px rgba(138, 43, 226, 0.4)
-              `
+              `,
+              animation: 'gentle-glow 4s ease-in-out infinite'
             }}
           >
             SWISSVERSE
           </span>
         </div>
+
 
         {/* Subtitle */}
         <div className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
@@ -161,5 +178,6 @@ export const HeroSection = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
