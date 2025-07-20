@@ -1,5 +1,5 @@
 import { HeroSection } from "@/components/HeroSection";
-import { StorySection } from "@/components/StorySection";
+import { SwissverseTimeline } from "@/components/SwissverseTimeline";
 import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
@@ -13,7 +13,7 @@ const Index = () => {
         <HeroSection />
         <SwissCharacter isHero={true} />
       </div>
-      <StorySection />
+      <SwissverseTimeline />
       <ProjectsShowcase />
       <ResourcesGrid />
       <Footer />
