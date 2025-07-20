@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User, Session } from "@supabase/supabase-js";
 import { HomePageManager } from "@/components/admin/HomePageManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
+import { YouTubeManager } from "@/components/admin/YouTubeManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -170,10 +171,7 @@ const Admin = () => {
             </TabsContent>
             
             <TabsContent value="youtube">
-              <div className="text-center py-8">
-                <h2 className="text-2xl font-bold mb-4">YouTube Management</h2>
-                <p className="text-muted-foreground">YouTube management coming soon...</p>
-              </div>
+              <YouTubeManager />
             </TabsContent>
             
             <TabsContent value="resources">
