@@ -1,9 +1,18 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Sparkles, Globe, Zap } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface HomePageContent {
+  section_key: string;
+  title: string;
+  content: string;
+  tag_type: string;
+}
 
 export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [content, setContent] = useState<HomePageContent[]>([]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -13,6 +22,36 @@ export const HeroSection = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  useEffect(() => {
+    fetchHomePageContent();
+  }, []);
+
+  const fetchHomePageContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('home_page_content')
+        .select('section_key, title, content, tag_type')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setContent(data || []);
+    } catch (error) {
+      console.error('Error fetching home page content:', error);
+    }
+  };
+
+  const getContent = (sectionKey: string) => {
+    return content.find(item => item.section_key === sectionKey);
+  };
+
+  const renderTitle = (sectionKey: string, defaultText: string, className: string = "") => {
+    const item = getContent(sectionKey);
+    const text = item?.title || defaultText;
+    const tagType = item?.tag_type || 'h1';
+    
+    return React.createElement(tagType, { className }, text);
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden select-none"
@@ -49,39 +88,34 @@ export const HeroSection = () => {
         {/* Content positioned above the 3D character background */}
 
         {/* Main Title */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
-          <span className="text-gradient">Welcome to the</span>{" "}
-          <span className="relative text-white uppercase">
-            SWISSVERSE
-            {/* Shiny background effect */}
-            <div className="absolute inset-0 -z-10 bg-white/20 blur-xl rounded-lg animate-pulse" />
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-white/10 via-white/30 to-white/10 blur-2xl rounded-lg" />
-          </span>
-        </h1>
+        <div className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
+          {renderTitle('hero_title', 'Welcome to SWISSVERSE', 'text-gradient')}
+        </div>
 
         {/* Subtitle */}
-        <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
-          Where <span className="text-white uppercase">SWISS</span> helps build the future of{" "}
-          <span className="text-gradient">Web3</span>, <span className="text-gradient">NFTs</span>, and{" "}
-          <span className="text-gradient">Metaverse</span>
-        </p>
+        <div className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
+          {renderTitle('hero_subtitle', 'where SWISS helps build the future of Web3, NFT and Metaverse', '')}
+        </div>
 
         {/* Feature Pills */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {[
-            { icon: Globe, text: "Metaverse Explorer" },
-            { icon: Zap, text: "Web3 Pioneer" },
-            { icon: Sparkles, text: "NFT Creator" },
-          ].map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 px-4 py-2 rounded-full card-glow text-sm md:text-base"
-              style={{ animationDelay: `${index * 0.2}s` }}
-            >
-              <item.icon size={20} className="text-primary" />
-              <span>{item.text}</span>
-            </div>
-          ))}
+            { icon: Globe, sectionKey: "explorer_title", defaultText: "Metaverse Explorer" },
+            { icon: Zap, sectionKey: "pioneer_title", defaultText: "Web3 Pioneer" },
+            { icon: Sparkles, sectionKey: "creator_title", defaultText: "NFT Creator" },
+          ].map((item, index) => {
+            const itemContent = getContent(item.sectionKey);
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-2 px-4 py-2 rounded-full card-glow text-sm md:text-base"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                <item.icon size={20} className="text-primary" />
+                <span>{itemContent?.title || item.defaultText}</span>
+              </div>
+            );
+          })}
         </div>
 
         {/* CTA Buttons */}

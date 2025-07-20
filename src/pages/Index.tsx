@@ -7,10 +7,12 @@ import { SwissCharacter } from "@/components/SwissCharacter";
 import { NFTStorySection } from "@/components/StorySection";
 import { MetaverseGallery } from "@/components/MetaverseGallery";
 import { YouTubeSection } from "@/components/YouTubeSection";
+import { SEOHead } from "@/components/SEOHead";
 
 const Index = () => {
   return (
     <div className="min-h-screen relative">
+      <SEOHead pageName="home" />
       {/* Hero with integrated 3D character */}
       <div className="relative">
         <HeroSection />

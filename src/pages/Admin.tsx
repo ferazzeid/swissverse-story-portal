@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { User, Session } from "@supabase/supabase-js";
+import { HomePageManager } from "@/components/admin/HomePageManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -125,8 +127,8 @@ const Admin = () => {
 
   if (user && isAdmin) {
     return (
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold text-gradient">Admin Panel</h1>
             <Button onClick={handleLogout} variant="outline">
@@ -134,27 +136,55 @@ const Admin = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="card-glow">
-              <CardHeader>
-                <CardTitle>Gallery Management</CardTitle>
-                <CardDescription>Manage metaverse gallery images</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
-              </CardContent>
-            </Card>
-
-            <Card className="card-glow">
-              <CardHeader>
-                <CardTitle>Timeline Content</CardTitle>
-                <CardDescription>Manage story timeline content</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
-              </CardContent>
-            </Card>
-          </div>
+          <Tabs defaultValue="home-page" className="w-full">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="home-page">Home Page</TabsTrigger>
+              <TabsTrigger value="gallery">Gallery</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              <TabsTrigger value="youtube">YouTube</TabsTrigger>
+              <TabsTrigger value="resources">Resources</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="home-page">
+              <HomePageManager />
+            </TabsContent>
+            
+            <TabsContent value="gallery">
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-4">Gallery Management</h2>
+                <p className="text-muted-foreground">Gallery management coming soon...</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="projects">
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-4">Projects Management</h2>
+                <p className="text-muted-foreground">Projects management coming soon...</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="timeline">
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-4">Timeline Management</h2>
+                <p className="text-muted-foreground">Timeline management coming soon...</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="youtube">
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-4">YouTube Management</h2>
+                <p className="text-muted-foreground">YouTube management coming soon...</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="resources">
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-4">Resources Management</h2>
+                <p className="text-muted-foreground">Resources management coming soon...</p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     );

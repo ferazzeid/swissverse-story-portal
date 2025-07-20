@@ -50,6 +50,39 @@ export type Database = {
         }
         Relationships: []
       }
+      home_page_content: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          section_key: string
+          tag_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          section_key: string
+          tag_type?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          section_key?: string
+          tag_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       metaverse_projects: {
         Row: {
           created_at: string
@@ -172,6 +205,36 @@ export type Database = {
           section_name?: string
           subtitle?: string | null
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seo_metadata: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          meta_description: string | null
+          meta_title: string | null
+          page_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          page_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          page_name?: string
           updated_at?: string
         }
         Relationships: []
