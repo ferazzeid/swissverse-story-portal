@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X, Calendar, Clock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -545,15 +546,23 @@ export const TimelineManager = () => {
                 </div>
               </div>
 
-              {/* Image URL */}
+              {/* Image Upload */}
               <div className="space-y-2">
-                <Label htmlFor="image-url">Image URL</Label>
-                <Input
-                  id="image-url"
-                  value={momentData.image_url}
-                  onChange={(e) => setMomentData(prev => ({ ...prev, image_url: e.target.value }))}
-                  placeholder="Optional image URL"
+                <Label htmlFor="image">Image</Label>
+                <ImageUpload
+                  bucket="timeline-images"
+                  currentImage={momentData.image_url}
+                  onUploadComplete={(url) => setMomentData(prev => ({ ...prev, image_url: url }))}
                 />
+                <div className="mt-2">
+                  <Label htmlFor="image-url">Or enter image URL</Label>
+                  <Input
+                    id="image-url"
+                    value={momentData.image_url}
+                    onChange={(e) => setMomentData(prev => ({ ...prev, image_url: e.target.value }))}
+                    placeholder="Optional image URL"
+                  />
+                </div>
               </div>
 
               {/* Preview */}

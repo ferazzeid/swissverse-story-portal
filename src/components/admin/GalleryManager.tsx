@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Edit, Trash2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Save, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
@@ -305,13 +306,21 @@ export const GalleryManager = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image-url">Image URL *</Label>
-                <Input
-                  id="image-url"
-                  value={imageData.image_url}
-                  onChange={(e) => setImageData(prev => ({ ...prev, image_url: e.target.value }))}
-                  placeholder="https://example.com/image.jpg or /src/assets/image.jpg"
+                <Label htmlFor="image">Image</Label>
+                <ImageUpload
+                  bucket="gallery-images"
+                  currentImage={imageData.image_url}
+                  onUploadComplete={(url) => setImageData(prev => ({ ...prev, image_url: url }))}
                 />
+                <div className="mt-2">
+                  <Label htmlFor="image-url">Or enter image URL</Label>
+                  <Input
+                    id="image-url"
+                    value={imageData.image_url}
+                    onChange={(e) => setImageData(prev => ({ ...prev, image_url: e.target.value }))}
+                    placeholder="https://example.com/image.jpg or /src/assets/image.jpg"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="alt-text">Alt Text *</Label>
