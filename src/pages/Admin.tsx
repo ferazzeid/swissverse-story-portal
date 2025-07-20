@@ -174,10 +174,7 @@ const Admin = () => {
             </TabsContent>
             
             <TabsContent value="resources">
-              <div className="text-center py-8">
-                <h2 className="text-2xl font-bold mb-4">Resources Management</h2>
-                <p className="text-muted-foreground">Resources management coming soon...</p>
-              </div>
+              <ResourcesManager />
             </TabsContent>
           </Tabs>
         </div>
