@@ -90,7 +90,21 @@ export const HeroSection = () => {
         {/* Main Title */}
         <div className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 slide-in-left">
           <span className="text-gradient">Welcome to </span>
-          <span className="text-white animate-pulse">SWISSVERSE</span>
+          <span 
+            className="text-white animate-pulse"
+            style={{
+              textShadow: `
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(255, 255, 255, 0.4),
+                0 0 40px rgba(138, 43, 226, 0.8),
+                0 0 70px rgba(138, 43, 226, 0.6),
+                0 0 80px rgba(138, 43, 226, 0.4)
+              `
+            }}
+          >
+            SWISSVERSE
+          </span>
         </div>
 
         {/* Subtitle */}
