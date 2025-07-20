@@ -4,7 +4,8 @@ import { ProjectsShowcase } from "@/components/ProjectsShowcase";
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
 import { SwissCharacter } from "@/components/SwissCharacter";
-import { StorySection, NFTStorySection } from "@/components/StorySection";
+import { NFTStorySection } from "@/components/StorySection";
+import { MetaverseGallery } from "@/components/MetaverseGallery";
 
 const Index = () => {
   return (
@@ -14,8 +15,8 @@ const Index = () => {
         <HeroSection />
         <SwissCharacter isHero={true} />
       </div>
+      <MetaverseGallery />
       <SwissverseTimeline />
-      <StorySection />
       <NFTStorySection />
       <ProjectsShowcase />
       <ResourcesGrid />

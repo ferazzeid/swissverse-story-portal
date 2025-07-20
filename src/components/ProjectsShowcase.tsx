@@ -42,13 +42,7 @@ const projects: Project[] = [
 ];
 
 export const ProjectsShowcase = () => {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
-
-  const categories = ["All", "DeFi", "NFT", "Metaverse", "Tools"];
-  const filteredProjects = activeCategory === "All" 
-    ? projects 
-    : projects.filter(project => project.category === activeCategory);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -70,23 +64,10 @@ export const ProjectsShowcase = () => {
         </p>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-4 mb-12">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeCategory === category ? "cyber" : "glow"}
-            onClick={() => setActiveCategory(category)}
-            className="transition-all duration-300"
-          >
-            {category}
-          </Button>
-        ))}
-      </div>
 
       {/* Projects Grid */}
       <div className="grid md:grid-cols-2 gap-8">
-        {filteredProjects.map((project, index) => (
+        {projects.map((project, index) => (
           <Card
             key={project.id}
             className={`card-glow p-6 cursor-pointer transition-all duration-500 ${
