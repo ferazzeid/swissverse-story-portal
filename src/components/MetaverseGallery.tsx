@@ -1,34 +1,72 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const galleryImages = [
-  {
-    src: "/src/assets/timeline-matrix.jpg",
-    alt: "Digital Matrix Environment"
-  },
-  {
-    src: "/src/assets/timeline-circuit.jpg", 
-    alt: "Circuit Technology"
-  },
-  {
-    src: "/src/assets/timeline-community.jpg",
-    alt: "Metaverse Community"
-  },
-  {
-    src: "/src/assets/timeline-laptop.jpg",
-    alt: "Digital Innovation"
-  }
-];
+interface GalleryImage {
+  id: string;
+  title: string;
+  description: string | null;
+  alt_text: string;
+  image_url: string;
+  display_order: number;
+  is_active: boolean;
+}
 
 export const MetaverseGallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % galleryImages.length);
-    }, 4000);
-
-    return () => clearInterval(interval);
+    fetchGalleryImages();
   }, []);
+
+  const fetchGalleryImages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setGalleryImages(data || []);
+    } catch (error) {
+      console.error('Error fetching gallery images:', error);
+      // Fallback to default images if database fails
+      setGalleryImages([
+        {
+          id: '1',
+          title: 'Digital Matrix Environment',
+          description: null,
+          alt_text: 'Digital Matrix Environment',
+          image_url: '/src/assets/timeline-matrix.jpg',
+          display_order: 1,
+          is_active: true
+        },
+        {
+          id: '2',
+          title: 'Circuit Technology',
+          description: null,
+          alt_text: 'Circuit Technology',
+          image_url: '/src/assets/timeline-circuit.jpg',
+          display_order: 2,
+          is_active: true
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (galleryImages.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % galleryImages.length);
+      }, 4000);
+
+      return () => clearInterval(interval);
+    }
+  }, [galleryImages.length]);
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
@@ -44,8 +82,8 @@ export const MetaverseGallery = () => {
             }`}
           >
             <img
-              src={image.src}
-              alt={image.alt}
+              src={image.image_url}
+              alt={image.alt_text}
               className="w-full h-full object-cover"
             />
             {/* Overlay gradient */}

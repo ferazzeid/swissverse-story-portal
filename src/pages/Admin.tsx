@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { User, Session } from "@supabase/supabase-js";
 import { HomePageManager } from "@/components/admin/HomePageManager";
+import { GalleryManager } from "@/components/admin/GalleryManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -151,10 +152,7 @@ const Admin = () => {
             </TabsContent>
             
             <TabsContent value="gallery">
-              <div className="text-center py-8">
-                <h2 className="text-2xl font-bold mb-4">Gallery Management</h2>
-                <p className="text-muted-foreground">Gallery management coming soon...</p>
-              </div>
+              <GalleryManager />
             </TabsContent>
             
             <TabsContent value="projects">
