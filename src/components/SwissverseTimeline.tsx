@@ -165,13 +165,13 @@ export const SwissverseTimeline = () => {
                 {yearData.moments.map((moment, momentIndex) => (
                   <div
                     key={moment.id}
-                    className="flex items-center justify-center"
+                    className="relative flex justify-center"
                   >
-                    {/* Content Card - Always start left, then alternate */}
-                    <div className={`relative w-full max-w-lg md:max-w-md ${
+                    {/* Content Card - Clear left/right positioning */}
+                    <div className={`relative w-full max-w-md ${
                       momentIndex % 2 === 0 
-                        ? "md:mr-8 md:ml-0" 
-                        : "md:ml-8 md:mr-0 md:ml-auto"
+                        ? "md:mr-auto md:ml-0 md:translate-x-0" 
+                        : "md:ml-auto md:mr-0 md:translate-x-0"
                     }`}>
                       <Card className="card-glow overflow-hidden animate-fade-in">
                         {/* Optional Image - extends to edges with straight bottom */}
@@ -211,23 +211,25 @@ export const SwissverseTimeline = () => {
                           </p>
                         </div>
                       </Card>
+                    </div>
 
-                      {/* Timeline Connector - Fixed positioning */}
-                      <div className={`absolute top-8 ${
-                        momentIndex % 2 === 0 
-                          ? "md:-right-6 -right-4" 
-                          : "md:-left-6 -left-4"
-                      } flex items-center`}>
-                        <div className={`${
-                          momentIndex % 2 === 0 
-                            ? "md:order-2 order-2" 
-                            : "md:order-1 order-1"
-                        } w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background`} />
-                        <div className={`${
-                          momentIndex % 2 === 0 
-                            ? "md:order-1 order-1 md:w-6 w-4" 
-                            : "md:order-2 order-2 md:w-6 w-4"
-                        } h-0.5 bg-gradient-to-r ${moment.gradient}`} />
+                    {/* Timeline Connector - Properly positioned for left/right */}
+                    <div className={`absolute top-8 left-1/2 transform -translate-x-1/2 ${
+                      momentIndex % 2 === 0 ? 'md:translate-x-8' : 'md:-translate-x-8'
+                    }`}>
+                      <div className="flex items-center">
+                        {/* Left side connector line */}
+                        {momentIndex % 2 === 0 && (
+                          <div className={`w-8 h-0.5 bg-gradient-to-r ${moment.gradient} md:block hidden`} />
+                        )}
+                        
+                        {/* Center dot */}
+                        <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background z-10`} />
+                        
+                        {/* Right side connector line */}
+                        {momentIndex % 2 === 1 && (
+                          <div className={`w-8 h-0.5 bg-gradient-to-r ${moment.gradient} md:block hidden`} />
+                        )}
                       </div>
                     </div>
                   </div>
