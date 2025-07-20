@@ -165,13 +165,30 @@ export const SwissverseTimeline = () => {
                 {yearData.moments.map((moment, momentIndex) => (
                   <div
                     key={moment.id}
-                    className={`flex items-center gap-8 ${
-                      momentIndex % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                    }`}
+                    className="flex items-center justify-center"
                   >
-                    {/* Content Side */}
-                    <div className="flex-1">
+                    {/* Content Card - Centered on mobile, alternating on desktop */}
+                    <div className={`relative w-full max-w-lg md:max-w-md ${
+                      momentIndex % 2 === 0 
+                        ? "md:mr-8 md:ml-auto" 
+                        : "md:ml-8 md:mr-auto"
+                    }`}>
                       <Card className="card-glow p-6 animate-fade-in">
+                        {/* Optional Image at top of card */}
+                        {moment.image && (
+                          <div className="relative overflow-hidden rounded-lg mb-4">
+                            <img
+                              src={moment.image}
+                              alt={moment.title}
+                              className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                            <div className="absolute bottom-3 left-3">
+                              <div className="text-sm font-medium text-white">{moment.month}</div>
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="flex items-start gap-4 mb-4">
                           <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient} animate-scale-in`}>
                             <moment.icon size={24} className="text-white" />
@@ -183,38 +200,29 @@ export const SwissverseTimeline = () => {
                                 {moment.highlight}
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
+                            {!moment.image && (
+                              <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
+                            )}
                           </div>
                         </div>
                         <p className="text-muted-foreground leading-relaxed">
                           {moment.content}
                         </p>
                       </Card>
-                    </div>
 
-                    {/* Timeline Connector */}
-                    <div className="relative">
-                      <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background`} />
-                      <div className={`absolute top-1/2 ${
-                        momentIndex % 2 === 0 ? "-left-8 w-8" : "-right-8 w-8"
-                      } h-0.5 bg-gradient-to-r ${moment.gradient} transform -translate-y-1/2`} />
-                    </div>
-
-                    {/* Image Side */}
-                    <div className="flex-1">
-                      {moment.image && (
-                        <div className="relative overflow-hidden rounded-xl card-glow">
-                          <img
-                            src={moment.image}
-                            alt={moment.title}
-                            className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                          <div className="absolute bottom-4 left-4">
-                            <div className="text-sm font-medium text-white">{moment.month}</div>
-                          </div>
-                        </div>
-                      )}
+                      {/* Timeline Connector */}
+                      <div className={`absolute top-8 ${
+                        momentIndex % 2 === 0 
+                          ? "md:-right-12 -right-6" 
+                          : "md:-left-12 -left-6"
+                      } flex items-center`}>
+                        <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background`} />
+                        <div className={`${
+                          momentIndex % 2 === 0 
+                            ? "md:-ml-2 -ml-2 md:w-8 w-6" 
+                            : "md:-mr-2 -mr-2 md:w-8 w-6 md:-translate-x-8 -translate-x-6"
+                        } h-0.5 bg-gradient-to-r ${moment.gradient}`} />
+                      </div>
                     </div>
                   </div>
                 ))}
