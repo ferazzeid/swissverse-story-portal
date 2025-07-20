@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Globe, Twitter, Github, Mail, Heart } from "lucide-react";
+import { Globe, Twitter, Github, Mail, Heart, Instagram, Youtube } from "lucide-react";
 
 export const Footer = () => {
   const socialLinks = [
-    { icon: Twitter, url: "https://twitter.com/swissverse", label: "Twitter" },
+    { icon: Twitter, url: "https://x.com/swissverse", label: "X" },
+    { icon: Instagram, url: "https://www.instagram.com/swiss.verse/", label: "Instagram" },
+    { icon: Youtube, url: "https://www.youtube.com/@SWISSVERSE", label: "YouTube" },
     { icon: Github, url: "https://github.com/swissverse", label: "GitHub" },
-    { icon: Globe, url: "https://swissverse.org", label: "Website" },
     { icon: Mail, url: "mailto:hello@swissverse.org", label: "Email" },
   ];
 
@@ -13,28 +14,10 @@ export const Footer = () => {
     {
       title: "Projects",
       links: [
-        { name: "HyperFi", url: "https://hyperfi.swiss" },
-        { name: "Central Hub", url: "https://central.swiss" },
+        { name: "hyperfy", url: "https://hyperfi.swiss" },
+        { name: "Decentraland", url: "https://central.swiss" },
         { name: "NFT Studio", url: "#" },
         { name: "Metaverse", url: "https://world.swissverse.org" },
-      ]
-    },
-    {
-      title: "Resources",
-      links: [
-        { name: "Tools", url: "#resources" },
-        { name: "Documentation", url: "#" },
-        { name: "Community", url: "#" },
-        { name: "Blog", url: "#" },
-      ]
-    },
-    {
-      title: "Web3",
-      links: [
-        { name: "DeFi", url: "#" },
-        { name: "NFTs", url: "#" },
-        { name: "Metaverse", url: "#" },
-        { name: "Decentralization", url: "#" },
       ]
     }
   ];
@@ -62,36 +45,43 @@ export const Footer = () => {
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Call to Action Section */}
         <div className="text-center mb-16">
-          <h3 className="text-3xl md:text-5xl font-bold mb-6 text-gradient">
-            Ready to Enter the Swissverse?
+          <h3 className="text-3xl md:text-5xl font-bold mb-6 text-white">
+            Ready to Enter the SWISSVERSE?
           </h3>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join Swiss on the journey to build the future of Web3, DeFi, and the metaverse
+            Join SWISS on the journey pioneering the Metaverse
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="cyber" size="xl">
+            <Button 
+              variant="cyber" 
+              size="xl"
+              onClick={() => window.open("https://world.swissverse.org", "_blank")}
+            >
               <Globe className="mr-2" />
               Visit Metaverse
             </Button>
-            <Button variant="glow" size="xl">
+            <Button 
+              variant="glow" 
+              size="xl"
+              onClick={() => window.open("https://thecentralend.org", "_blank")}
+            >
               Join Community
             </Button>
           </div>
         </div>
 
         {/* Footer Content */}
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Brand Section */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full card-glow flex items-center justify-center text-2xl font-bold text-gradient">
                 SV
               </div>
-              <span className="text-xl font-bold">Swissverse</span>
+              <span className="text-xl font-bold">SWISSVERSE</span>
             </div>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Building the future of Web3, DeFi, and the metaverse with innovation, 
-              security, and true decentralization.
+              Pioneering the Metaverse with innovation, security, and true decentralization.
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social, index) => (
@@ -132,16 +122,10 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-border pt-8 flex justify-center items-center">
           <div className="text-muted-foreground text-sm">
-            © 2024 Swissverse. Built with{" "}
+            © 2025 SWISSVERSE. Built with{" "}
             <Heart size={14} className="inline text-red-500 mx-1" />
-            for the decentralized future.
-          </div>
-          <div className="flex gap-6 text-sm text-muted-foreground">
-            <button className="hover:text-primary transition-colors">Privacy</button>
-            <button className="hover:text-primary transition-colors">Terms</button>
-            <button className="hover:text-primary transition-colors">Security</button>
           </div>
         </div>
       </div>
