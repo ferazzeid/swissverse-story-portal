@@ -320,25 +320,37 @@ export const SwissverseTimeline = () => {
                           : "mx-auto md:ml-auto md:mr-0"
                       }`}>
                         <Card className="card-glow overflow-hidden animate-fade-in">
-                          {/* Optional Image - extends to edges with straight bottom */}
-                          {moment.image_url && (
-                            <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
-                              <img
-                                src={moment.image_url}
-                                alt={moment.title}
-                                className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                              <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
-                                <div className="text-sm font-medium text-white">{moment.month}</div>
+                          {/* Image section - consistent height regardless of image presence */}
+                          <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
+                            {moment.image_url ? (
+                              <div className="relative h-48 overflow-hidden">
+                                <img
+                                  src={moment.image_url}
+                                  alt={moment.title}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                  onError={(e) => {
+                                    // Replace with placeholder if image fails to load
+                                    e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=192&fit=crop";
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                                <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
+                                  <div className="text-sm font-medium text-white">{moment.month}</div>
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            ) : (
+                              <div className="h-48 bg-gradient-to-br from-muted/20 to-muted/40 flex items-center justify-center">
+                                <div className="text-center">
+                                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${moment.gradient_class} flex items-center justify-center mx-auto mb-2`}>
+                                    <Calendar size={24} className="text-white" />
+                                  </div>
+                                  <div className="text-sm font-medium text-muted-foreground">{moment.month}</div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                           
-                          <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
+                          <div className="p-6 pt-4">
                             <div className="flex items-start gap-4 mb-4">
                               <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} animate-scale-in`}>
                                 <IconComponent size={24} className="text-white" />
@@ -350,9 +362,6 @@ export const SwissverseTimeline = () => {
                                     {moment.highlight}
                                   </Badge>
                                 </div>
-                                {!moment.image_url && (
-                                  <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
-                                )}
                               </div>
                             </div>
                             <p className="text-muted-foreground leading-relaxed">
