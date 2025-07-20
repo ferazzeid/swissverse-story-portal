@@ -168,10 +168,10 @@ export const SwissverseTimeline = () => {
                     className="relative"
                   >
                     {/* Content Card with proper left/right positioning */}
-                    <div className={`relative w-full max-w-md mx-auto ${
+                    <div className={`relative w-full max-w-md ${
                       momentIndex % 2 === 0 
-                        ? "md:mr-auto md:ml-0" 
-                        : "md:ml-auto md:mr-0"
+                        ? "mx-auto md:mr-auto md:ml-0" 
+                        : "mx-auto md:ml-auto md:mr-0"
                     }`}>
                       <Card className="card-glow overflow-hidden animate-fade-in">
                         {/* Optional Image - extends to edges with straight bottom */}
