@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Globe, Twitter, Mail, Heart, Instagram, Youtube } from "lucide-react";
-import svLogo from "@/assets/sv-logo-cube.gif";
+import svLogo from "/lovable-uploads/39d7376b-c87b-4dbe-bac5-8d101bcef3a7.png";
 
 export const Footer = () => {
   const socialLinks = [
@@ -14,8 +14,8 @@ export const Footer = () => {
     {
       title: "Projects",
       links: [
-        { name: "Hyperfy", url: "https://hyperfi.swiss" },
-        { name: "Decentraland", url: "https://central.swiss" },
+        { name: "Hyperfy", url: "https://world.swissverse.org" },
+        { name: "Decentraland", url: "https://decentraland.org/" },
       ]
     }
   ];
