@@ -10,15 +10,6 @@ export const Footer = () => {
     { icon: Mail, url: "mailto:swiss@dcl.business", label: "Email" },
   ];
 
-  const footerLinks = [
-    {
-      title: "Projects",
-      links: [
-        { name: "Hyperfy", url: "https://world.swissverse.org" },
-        { name: "Decentraland", url: "https://decentraland.org/" },
-      ]
-    }
-  ];
 
   return (
     <footer className="relative py-20 px-4 overflow-hidden">
@@ -68,22 +59,21 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Content */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Brand Section */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
+        {/* Footer Content - Centered Brand Section */}
+        <div className="flex justify-center mb-12">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
               <img 
                 src={svLogo} 
                 alt="SWISSVERSE Logo" 
-                className="w-12 h-12 rounded-full"
+                className="w-12 h-12"
               />
               <span className="text-xl font-bold">SWISSVERSE</span>
             </div>
             <p className="text-muted-foreground mb-6 leading-relaxed">
               Pioneering the Metaverse
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 justify-center">
               {socialLinks.map((social, index) => (
                 <Button
                   key={index}
@@ -97,28 +87,6 @@ export const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Links Sections */}
-          {footerLinks.map((section, index) => (
-            <div key={index}>
-              <h4 className="text-lg font-semibold mb-4 text-primary">
-                {section.title}
-              </h4>
-              <ul className="space-y-2">
-                {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    <button
-                      onClick={() => link.url !== "#" && window.open(link.url, "_blank")}
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                      disabled={link.url === "#"}
-                    >
-                      {link.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
 
         {/* Bottom Bar */}
