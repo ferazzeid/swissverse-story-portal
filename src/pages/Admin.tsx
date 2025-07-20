@@ -11,6 +11,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { HomePageManager } from "@/components/admin/HomePageManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { YouTubeManager } from "@/components/admin/YouTubeManager";
+import { ResourcesManager } from "@/components/admin/ResourcesManager";
 import { TimelineManager } from "@/components/admin/TimelineManager";
 
 const Admin = () => {
@@ -145,8 +146,8 @@ const Admin = () => {
               <TabsTrigger value="gallery">Gallery</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="youtube">YouTube</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
+            <TabsTrigger value="youtube">YouTube</TabsTrigger>
+            <TabsTrigger value="resources">Resources</TabsTrigger>
             </TabsList>
             
             <TabsContent value="home-page">

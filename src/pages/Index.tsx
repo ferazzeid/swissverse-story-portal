@@ -5,7 +5,7 @@ import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
 import { SwissCharacter } from "@/components/SwissCharacter";
 import { NFTStorySection } from "@/components/StorySection";
-import { MetaverseGallery } from "@/components/MetaverseGallery";
+
 import { YouTubeSection } from "@/components/YouTubeSection";
 import { SEOHead } from "@/components/SEOHead";
 
@@ -18,7 +18,6 @@ const Index = () => {
         <HeroSection />
         <SwissCharacter isHero={true} />
       </div>
-      <MetaverseGallery />
       <SwissverseTimeline />
       <NFTStorySection />
       <ProjectsShowcase />
