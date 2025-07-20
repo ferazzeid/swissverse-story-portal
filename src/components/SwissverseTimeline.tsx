@@ -165,13 +165,13 @@ export const SwissverseTimeline = () => {
                 {yearData.moments.map((moment, momentIndex) => (
                   <div
                     key={moment.id}
-                    className="relative flex justify-center"
+                    className="relative"
                   >
-                    {/* Content Card - Clear left/right positioning */}
-                    <div className={`relative w-full max-w-md ${
+                    {/* Content Card with proper left/right positioning */}
+                    <div className={`relative w-full max-w-md mx-auto ${
                       momentIndex % 2 === 0 
-                        ? "md:mr-auto md:ml-0 md:translate-x-0" 
-                        : "md:ml-auto md:mr-0 md:translate-x-0"
+                        ? "md:mr-auto md:ml-0" 
+                        : "md:ml-auto md:mr-0"
                     }`}>
                       <Card className="card-glow overflow-hidden animate-fade-in">
                         {/* Optional Image - extends to edges with straight bottom */}
@@ -183,7 +183,7 @@ export const SwissverseTimeline = () => {
                               className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                            <div className="absolute bottom-3 left-6">
+                            <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
                               <div className="text-sm font-medium text-white">{moment.month}</div>
                             </div>
                           </div>
@@ -211,25 +211,28 @@ export const SwissverseTimeline = () => {
                           </p>
                         </div>
                       </Card>
-                    </div>
 
-                    {/* Timeline Connector - Properly positioned for left/right */}
-                    <div className={`absolute top-8 left-1/2 transform -translate-x-1/2 ${
-                      momentIndex % 2 === 0 ? 'md:translate-x-8' : 'md:-translate-x-8'
-                    }`}>
-                      <div className="flex items-center">
-                        {/* Left side connector line */}
-                        {momentIndex % 2 === 0 && (
-                          <div className={`w-8 h-0.5 bg-gradient-to-r ${moment.gradient} md:block hidden`} />
-                        )}
-                        
-                        {/* Center dot */}
-                        <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background z-10`} />
-                        
-                        {/* Right side connector line */}
-                        {momentIndex % 2 === 1 && (
-                          <div className={`w-8 h-0.5 bg-gradient-to-r ${moment.gradient} md:block hidden`} />
-                        )}
+                      {/* Timeline Connector - Simplified and properly positioned */}
+                      <div className={`absolute top-8 z-20 ${
+                        momentIndex % 2 === 0 
+                          ? "md:-right-6 right-0 md:left-auto left-1/2 md:transform-none transform -translate-x-1/2" 
+                          : "md:-left-6 left-0 md:right-auto right-1/2 md:transform-none transform translate-x-1/2"
+                      }`}>
+                        <div className="flex items-center">
+                          {/* Connector line to center */}
+                          <div className={`h-0.5 bg-gradient-to-r ${moment.gradient} ${
+                            momentIndex % 2 === 0 
+                              ? "w-6 md:order-1 order-2" 
+                              : "w-6 md:order-2 order-1"
+                          }`} />
+                          
+                          {/* Center dot */}
+                          <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient} border-4 border-background ${
+                            momentIndex % 2 === 0 
+                              ? "md:order-2 order-1" 
+                              : "md:order-1 order-2"
+                          }`} />
+                        </div>
                       </div>
                     </div>
                   </div>
