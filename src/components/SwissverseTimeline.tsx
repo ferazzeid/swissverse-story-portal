@@ -274,7 +274,7 @@ export const SwissverseTimeline = () => {
           <span className="text-gradient">Story</span>
         </h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Journey through the evolution of <span className="text-white uppercase font-semibold">SWISS</span> and discover the vision that drives the Swissverse forward
+          Journey through the evolution of <span className="text-white uppercase font-semibold">SWISS</span> and discover the vision that drives the <span className="text-white uppercase font-semibold">SWISSVERSE</span> forward
         </p>
       </div>
 
@@ -380,8 +380,8 @@ export const SwissverseTimeline = () => {
                                 : "w-6 md:order-2 order-1"
                             }`} />
                             
-                            {/* Center dot with gradient */}
-                            <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient_class} border-2 border-white/40 shadow-md ${
+                            {/* Center dot with gradient - smaller to avoid artifacts */}
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
                               momentIndex % 2 === 0 
                                 ? "md:order-2 order-1" 
                                 : "md:order-1 order-2"
