@@ -102,12 +102,10 @@ export const StoryModal = () => {
           Back to Timeline
         </Button>
         
-        {!isModal && (
-          <Button onClick={() => window.open(`/story/${slug}`, '_blank')} variant="ghost">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Share Story
-          </Button>
-        )}
+        <Button onClick={() => window.open(`/story/${slug}`, '_blank')} variant="ghost">
+          <ExternalLink className="w-4 h-4 mr-2" />
+          {isModal ? 'Open in New Tab' : 'Share Story'}
+        </Button>
       </div>
     </div>
   );
