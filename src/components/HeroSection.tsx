@@ -124,6 +124,11 @@ export const HeroSection = () => {
         </div>
 
 
+        {/* Subtitle */}
+        <div className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
+          <span className="text-white">Web3, NFT, AI and Metaverse</span>
+        </div>
+
         {/* Feature Pills */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {[

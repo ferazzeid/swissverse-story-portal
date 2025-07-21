@@ -380,14 +380,12 @@ export const SwissverseTimeline = () => {
                                 : "w-6 md:order-2 order-1"
                             }`} />
                             
-                            {/* Center dot with gradient and icon - larger for visibility */}
-                            <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${moment.gradient_class} border-2 border-white shadow-lg flex items-center justify-center ${
+                            {/* Center dot with gradient */}
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
                               momentIndex % 2 === 0 
                                 ? "md:order-2 order-1" 
                                 : "md:order-1 order-2"
-                            }`}>
-                              <IconComponent className="w-4 h-4 text-white drop-shadow-sm" />
-                            </div>
+                            }`} />
                           </div>
                         </div>
                       </div>
