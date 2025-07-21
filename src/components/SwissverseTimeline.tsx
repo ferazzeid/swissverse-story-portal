@@ -267,42 +267,49 @@ export const SwissverseTimeline = () => {
   }
 
   return (
-    <section className="py-20 px-4 max-w-6xl mx-auto relative overflow-hidden">
-      {/* Flowing wave SVG background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 1200 800" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgb(147, 51, 234)" stopOpacity="0.4" />
-              <stop offset="50%" stopColor="rgb(236, 72, 153)" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="0.4" />
-            </linearGradient>
-            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgb(236, 72, 153)" stopOpacity="0.3" />
-              <stop offset="50%" stopColor="rgb(59, 130, 246)" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="rgb(147, 51, 234)" stopOpacity="0.3" />
-            </linearGradient>
-          </defs>
-          
-          {/* Wave 1 */}
-          <path 
-            d="M0,400 C150,300 350,500 600,400 C850,300 1050,500 1200,400 L1200,800 L0,800 Z" 
-            fill="url(#wave1)"
-            className="animate-wave"
-            style={{transformOrigin: 'center', animation: 'wave 15s ease-in-out infinite'}}
+    <section className="py-20 px-4 max-w-6xl mx-auto relative">
+      {/* Full-width metaverse background - positioned to span entire viewport */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 opacity-20">
+          {/* Animated gradient mesh background */}
+          <div 
+            className="absolute inset-0 animate-float"
+            style={{
+              background: `
+                radial-gradient(circle at 20% 50%, rgba(147, 51, 234, 0.6) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.5) 0%, transparent 50%),
+                radial-gradient(circle at 60% 80%, rgba(59, 130, 246, 0.4) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(236, 72, 153, 0.1) 50%, rgba(59, 130, 246, 0.1) 100%)
+              `,
+              filter: 'blur(60px)'
+            }}
           />
-          
-          {/* Wave 2 */}
-          <path 
-            d="M0,500 C200,400 400,600 600,500 C800,400 1000,600 1200,500 L1200,800 L0,800 Z" 
-            fill="url(#wave2)"
-            className="animate-float"
-            style={{transformOrigin: 'center', animation: 'float 20s ease-in-out infinite reverse'}}
+          <div 
+            className="absolute inset-0 animate-wave"
+            style={{
+              background: `
+                radial-gradient(ellipse at 40% 30%, rgba(236, 72, 153, 0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 70%, rgba(59, 130, 246, 0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 10% 90%, rgba(147, 51, 234, 0.3) 0%, transparent 60%)
+              `,
+              filter: 'blur(80px)'
+            }}
           />
-        </svg>
+          {/* Subtle geometric overlay */}
+          <div 
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `
+                linear-gradient(45deg, transparent 40%, rgba(147, 51, 234, 0.05) 50%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, rgba(236, 72, 153, 0.05) 50%, transparent 60%)
+              `,
+              backgroundSize: '100px 100px'
+            }}
+          />
+        </div>
       </div>
       
-      {/* Content */}
+      {/* Content with proper z-index */}
       <div className="relative z-10">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-6xl font-bold mb-6">
