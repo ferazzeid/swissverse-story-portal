@@ -268,25 +268,25 @@ export const SwissverseTimeline = () => {
 
   return (
     <section className="py-20 px-4 max-w-6xl mx-auto relative overflow-hidden">
-      {/* Subtle animated wave background */}
-      <div className="absolute inset-0 opacity-15">
+      {/* Subtle animated wave background - increased opacity for visibility */}
+      <div className="absolute inset-0 opacity-40 pointer-events-none">
         <div className="absolute inset-0 animate-float" 
              style={{
                background: `
-                 radial-gradient(ellipse at 20% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
-                 radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-                 radial-gradient(ellipse at 40% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%)
+                 radial-gradient(ellipse at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 70%),
+                 radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 70%),
+                 radial-gradient(ellipse at 40% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
                `
              }} />
-        <div className="absolute inset-0 opacity-50 animate-wave"
+        <div className="absolute inset-0 animate-wave"
              style={{
                background: `
                  linear-gradient(135deg, 
-                   transparent 0%, 
-                   rgba(147, 51, 234, 0.08) 25%, 
-                   transparent 50%, 
-                   rgba(236, 72, 153, 0.08) 75%, 
-                   transparent 100%
+                   rgba(147, 51, 234, 0.1) 0%, 
+                   transparent 25%, 
+                   rgba(236, 72, 153, 0.15) 50%, 
+                   transparent 75%, 
+                   rgba(59, 130, 246, 0.1) 100%
                  )
                `
              }} />
