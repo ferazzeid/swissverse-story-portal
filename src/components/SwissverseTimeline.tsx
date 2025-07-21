@@ -345,7 +345,7 @@ export const SwissverseTimeline = () => {
                           
                           <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
                             <div className="flex items-start gap-4 mb-4">
-                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} shadow-lg border-2 border-background/20 animate-scale-in`}>
+                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} shadow-lg border-2 border-white/30 animate-scale-in backdrop-blur-sm`} style={{backgroundSize: 'cover', backgroundPosition: 'center'}}>
                                 <IconComponent size={24} className="text-white drop-shadow-sm" />
                               </div>
                               <div className="flex-1">
