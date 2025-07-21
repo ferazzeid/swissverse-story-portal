@@ -380,8 +380,8 @@ export const SwissverseTimeline = () => {
                                 : "w-6 md:order-2 order-1"
                             }`} />
                             
-                            {/* Center dot with gradient - smaller to avoid artifacts */}
-                            <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
+                            {/* Center dot with gradient - even smaller to hide square image artifacts */}
+                            <div className={`w-2.5 h-2.5 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
                               momentIndex % 2 === 0 
                                 ? "md:order-2 order-1" 
                                 : "md:order-1 order-2"
