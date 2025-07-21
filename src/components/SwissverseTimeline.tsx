@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 // Import timeline images
@@ -13,7 +14,8 @@ import communityImage from "@/assets/timeline-community.jpg";
 import {
   Calendar, Rocket, Coins, Globe, Cpu, Users, Mountain,
   Sparkles, Zap, Eye, Heart, Star, Trophy, Target, Lightbulb,
-  Code, Database, Shield, Lock, Key, Wifi, Cloud, Server, Building, Crown
+  Code, Database, Shield, Lock, Key, Wifi, Cloud, Server, Building, Crown,
+  BookOpen, ArrowRight
 } from "lucide-react";
 
 interface TimelineMoment {
@@ -29,6 +31,10 @@ interface TimelineMoment {
   gradient_class: string;
   display_order: number;
   is_active: boolean;
+  story_slug?: string;
+  full_story?: string;
+  has_story?: boolean;
+  story_image_url?: string;
 }
 
 interface TimelineYear {
@@ -195,6 +201,7 @@ const fallbackTimelineData: TimelineYear[] = [
 export const SwissverseTimeline = () => {
   const [timelineData, setTimelineData] = useState<TimelineYear[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     fetchTimelineData();
@@ -403,9 +410,24 @@ export const SwissverseTimeline = () => {
                                 )}
                               </div>
                             </div>
-                            <p className="text-muted-foreground leading-relaxed">
+                            <p className="text-muted-foreground leading-relaxed mb-4">
                               {moment.content}
                             </p>
+                            
+                            {/* Story link if available */}
+                            {moment.has_story && moment.story_slug && (
+                              <div className="pt-4 border-t border-border/50">
+                                <Link
+                                  to={`/story/${moment.story_slug}`}
+                                  state={{ backgroundLocation: location }}
+                                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+                                >
+                                  <BookOpen size={16} />
+                                  Read the full story
+                                  <ArrowRight size={14} />
+                                </Link>
+                              </div>
+                            )}
                           </div>
                         </Card>
 

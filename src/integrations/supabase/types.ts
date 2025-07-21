@@ -244,13 +244,17 @@ export type Database = {
           content: string
           created_at: string
           display_order: number
+          full_story: string | null
           gradient_class: string
+          has_story: boolean | null
           highlight: string
           icon_name: string
           id: string
           image_url: string | null
           is_active: boolean
           month: string
+          story_image_url: string | null
+          story_slug: string | null
           title: string
           updated_at: string
           year: number
@@ -260,13 +264,17 @@ export type Database = {
           content: string
           created_at?: string
           display_order?: number
+          full_story?: string | null
           gradient_class: string
+          has_story?: boolean | null
           highlight: string
           icon_name: string
           id?: string
           image_url?: string | null
           is_active?: boolean
           month: string
+          story_image_url?: string | null
+          story_slug?: string | null
           title: string
           updated_at?: string
           year: number
@@ -276,13 +284,17 @@ export type Database = {
           content?: string
           created_at?: string
           display_order?: number
+          full_story?: string | null
           gradient_class?: string
+          has_story?: boolean | null
           highlight?: string
           icon_name?: string
           id?: string
           image_url?: string | null
           is_active?: boolean
           month?: string
+          story_image_url?: string | null
+          story_slug?: string | null
           title?: string
           updated_at?: string
           year?: number
