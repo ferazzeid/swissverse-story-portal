@@ -4,7 +4,6 @@ import { GallerySlider } from "@/components/GallerySlider";
 import { ResourcesGrid } from "@/components/ResourcesGrid";
 import { Footer } from "@/components/Footer";
 import { SwissCharacter } from "@/components/SwissCharacter";
-import { NFTStorySection } from "@/components/StorySection";
 
 import { YouTubeSection } from "@/components/YouTubeSection";
 import { SEOHead } from "@/components/SEOHead";
@@ -20,7 +19,6 @@ const Index = () => {
       </div>
       <SwissverseTimeline />
       <GallerySlider />
-      <NFTStorySection />
       <YouTubeSection />
       <ResourcesGrid />
       <Footer />
