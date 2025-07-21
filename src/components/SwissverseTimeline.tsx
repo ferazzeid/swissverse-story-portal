@@ -267,7 +267,35 @@ export const SwissverseTimeline = () => {
   }
 
   return (
-    <section className="py-20 px-4 max-w-6xl mx-auto">
+    <section className="py-20 px-4 max-w-6xl mx-auto relative overflow-hidden">
+      {/* Subtle animated wave background */}
+      <div className="absolute inset-0 opacity-15">
+        <div className="absolute inset-0" 
+             style={{
+               background: `
+                 radial-gradient(ellipse at 20% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+                 radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                 radial-gradient(ellipse at 40% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%)
+               `,
+               animation: 'float 20s ease-in-out infinite'
+             }} />
+        <div className="absolute inset-0 opacity-50"
+             style={{
+               background: `
+                 linear-gradient(135deg, 
+                   transparent 0%, 
+                   rgba(147, 51, 234, 0.08) 25%, 
+                   transparent 50%, 
+                   rgba(236, 72, 153, 0.08) 75%, 
+                   transparent 100%
+                 )
+               `,
+               animation: 'wave 25s ease-in-out infinite reverse'
+             }} />
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-6xl font-bold mb-6">
           <span className="text-white uppercase">SWISSVERSE</span>{" "}
@@ -407,6 +435,7 @@ export const SwissverseTimeline = () => {
             <p className="text-sm text-muted-foreground">The journey continues</p>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );
