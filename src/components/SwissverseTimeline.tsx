@@ -268,25 +268,44 @@ export const SwissverseTimeline = () => {
 
   return (
     <section className="py-20 px-4 max-w-6xl mx-auto relative overflow-hidden">
-      {/* Subtle animated wave background - increased opacity for visibility */}
-      <div className="absolute inset-0 opacity-40 pointer-events-none">
-        <div className="absolute inset-0 animate-float" 
+      {/* More visible wave background with defined patterns */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Layer 1: Flowing shapes */}
+        <div className="absolute inset-0 opacity-60 animate-float" 
              style={{
                background: `
-                 radial-gradient(ellipse at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 70%),
-                 radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 70%),
-                 radial-gradient(ellipse at 40% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 70%)
+                 radial-gradient(circle at 25% 25%, rgba(147, 51, 234, 0.4) 0%, transparent 25%),
+                 radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.4) 0%, transparent 25%),
+                 radial-gradient(circle at 50% 10%, rgba(59, 130, 246, 0.3) 0%, transparent 20%)
                `
              }} />
-        <div className="absolute inset-0 animate-wave"
+        
+        {/* Layer 2: Diagonal waves */}
+        <div className="absolute inset-0 opacity-40 animate-wave"
              style={{
                background: `
-                 linear-gradient(135deg, 
-                   rgba(147, 51, 234, 0.1) 0%, 
-                   transparent 25%, 
-                   rgba(236, 72, 153, 0.15) 50%, 
-                   transparent 75%, 
-                   rgba(59, 130, 246, 0.1) 100%
+                 repeating-linear-gradient(
+                   45deg,
+                   rgba(147, 51, 234, 0.1) 0px,
+                   transparent 50px,
+                   rgba(236, 72, 153, 0.1) 100px,
+                   transparent 150px
+                 )
+               `
+             }} />
+             
+        {/* Layer 3: Vertical gradient bands */}
+        <div className="absolute inset-0 opacity-30"
+             style={{
+               background: `
+                 linear-gradient(
+                   90deg,
+                   transparent 0%,
+                   rgba(147, 51, 234, 0.2) 20%,
+                   transparent 40%,
+                   rgba(236, 72, 153, 0.2) 60%,
+                   transparent 80%,
+                   rgba(59, 130, 246, 0.2) 100%
                  )
                `
              }} />
