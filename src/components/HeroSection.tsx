@@ -126,7 +126,8 @@ export const HeroSection = () => {
 
         {/* Subtitle */}
         <div className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 slide-in-right">
-          {renderTitle('hero_subtitle', 'where SWISS helps build the future of Web3, NFT and Metaverse', '')}
+          {renderTitle('hero_subtitle', 'where SWISS helps build the future of ', '')} 
+          <span className="text-white">Web3, NFT, AI and Metaverse</span>
         </div>
 
         {/* Feature Pills */}
