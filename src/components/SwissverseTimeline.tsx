@@ -268,47 +268,38 @@ export const SwissverseTimeline = () => {
 
   return (
     <section className="py-20 px-4 max-w-6xl mx-auto relative overflow-hidden">
-      {/* More visible wave background with defined patterns */}
+      {/* Flowing wave SVG background */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Layer 1: Flowing shapes */}
-        <div className="absolute inset-0 opacity-60 animate-float" 
-             style={{
-               background: `
-                 radial-gradient(circle at 25% 25%, rgba(147, 51, 234, 0.4) 0%, transparent 25%),
-                 radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.4) 0%, transparent 25%),
-                 radial-gradient(circle at 50% 10%, rgba(59, 130, 246, 0.3) 0%, transparent 20%)
-               `
-             }} />
-        
-        {/* Layer 2: Diagonal waves */}
-        <div className="absolute inset-0 opacity-40 animate-wave"
-             style={{
-               background: `
-                 repeating-linear-gradient(
-                   45deg,
-                   rgba(147, 51, 234, 0.1) 0px,
-                   transparent 50px,
-                   rgba(236, 72, 153, 0.1) 100px,
-                   transparent 150px
-                 )
-               `
-             }} />
-             
-        {/* Layer 3: Vertical gradient bands */}
-        <div className="absolute inset-0 opacity-30"
-             style={{
-               background: `
-                 linear-gradient(
-                   90deg,
-                   transparent 0%,
-                   rgba(147, 51, 234, 0.2) 20%,
-                   transparent 40%,
-                   rgba(236, 72, 153, 0.2) 60%,
-                   transparent 80%,
-                   rgba(59, 130, 246, 0.2) 100%
-                 )
-               `
-             }} />
+        <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 1200 800" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(147, 51, 234)" stopOpacity="0.4" />
+              <stop offset="50%" stopColor="rgb(236, 72, 153)" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="0.4" />
+            </linearGradient>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(236, 72, 153)" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="rgb(59, 130, 246)" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="rgb(147, 51, 234)" stopOpacity="0.3" />
+            </linearGradient>
+          </defs>
+          
+          {/* Wave 1 */}
+          <path 
+            d="M0,400 C150,300 350,500 600,400 C850,300 1050,500 1200,400 L1200,800 L0,800 Z" 
+            fill="url(#wave1)"
+            className="animate-wave"
+            style={{transformOrigin: 'center', animation: 'wave 15s ease-in-out infinite'}}
+          />
+          
+          {/* Wave 2 */}
+          <path 
+            d="M0,500 C200,400 400,600 600,500 C800,400 1000,600 1200,500 L1200,800 L0,800 Z" 
+            fill="url(#wave2)"
+            className="animate-float"
+            style={{transformOrigin: 'center', animation: 'float 20s ease-in-out infinite reverse'}}
+          />
+        </svg>
       </div>
       
       {/* Content */}
