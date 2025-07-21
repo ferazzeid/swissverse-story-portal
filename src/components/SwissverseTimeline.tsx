@@ -345,8 +345,8 @@ export const SwissverseTimeline = () => {
                           
                           <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
                             <div className="flex items-start gap-4 mb-4">
-                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} animate-scale-in`}>
-                                <IconComponent size={24} className="text-white" />
+                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} shadow-lg border-2 border-background/20 animate-scale-in`}>
+                                <IconComponent size={24} className="text-white drop-shadow-sm" />
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
@@ -373,15 +373,15 @@ export const SwissverseTimeline = () => {
                             : "md:-left-6 left-0 md:right-auto right-1/2 md:transform-none transform translate-x-1/2"
                         }`}>
                           <div className="flex items-center">
-                            {/* Connector line to center */}
-                            <div className={`h-0.5 bg-gradient-to-r ${moment.gradient_class} ${
+                            {/* Connector line to center - always visible */}
+                            <div className={`h-1 bg-white/60 shadow-md ${
                               momentIndex % 2 === 0 
                                 ? "w-6 md:order-1 order-2" 
                                 : "w-6 md:order-2 order-1"
                             }`} />
                             
-                            {/* Center dot */}
-                            <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient_class} border-4 border-background ${
+                            {/* Center dot with gradient */}
+                            <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${moment.gradient_class} border-2 border-white/40 shadow-md ${
                               momentIndex % 2 === 0 
                                 ? "md:order-2 order-1" 
                                 : "md:order-1 order-2"
