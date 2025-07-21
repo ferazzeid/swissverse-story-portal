@@ -13,7 +13,7 @@ import communityImage from "@/assets/timeline-community.jpg";
 import {
   Calendar, Rocket, Coins, Globe, Cpu, Users, Mountain,
   Sparkles, Zap, Eye, Heart, Star, Trophy, Target, Lightbulb,
-  Code, Database, Shield, Lock, Key, Wifi, Cloud, Server
+  Code, Database, Shield, Lock, Key, Wifi, Cloud, Server, Building, Crown
 } from "lucide-react";
 
 interface TimelineMoment {
@@ -61,7 +61,9 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
   key: Key,
   wifi: Wifi,
   cloud: Cloud,
-  server: Server
+  server: Server,
+  building: Building,
+  crown: Crown
 };
 
 // Fallback data - same as original timeline
@@ -279,7 +281,7 @@ export const SwissverseTimeline = () => {
       {/* Vertical Timeline */}
       <div className="relative">
         {/* Central Timeline Line - stops before the "To be continued" section */}
-        <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-purple-500 via-cyan-500 via-green-500 to-orange-500 transform -translate-x-1/2 rounded-full" style={{ height: 'calc(100% - 120px)' }} />
+        <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-purple-500 via-cyan-500 via-green-500 to-orange-500 transform -translate-x-1/2 rounded-full shadow-lg" style={{ height: 'calc(100% - 120px)' }} />
 
         <div className="space-y-24">
           {timelineData.map((yearData, yearIndex) => (
