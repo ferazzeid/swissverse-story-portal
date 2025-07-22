@@ -29,6 +29,8 @@ export const ResourcesGrid = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [sectionTitle, setSectionTitle] = useState<SectionTitle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+  const [displayLimit] = useState(9);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +73,13 @@ export const ResourcesGrid = () => {
     ? resources 
     : resources.filter(resource => resource.category === activeCategory);
 
+  // Determine which resources to display based on showAll state
+  const displayedResources = showAll 
+    ? filteredResources 
+    : filteredResources.slice(0, displayLimit);
+
+  const hasMore = filteredResources.length > displayLimit;
+
   const getCategoryGradient = (category: string) => {
     switch (category.toLowerCase()) {
       case "development": return "from-blue-500 to-cyan-500";
@@ -104,9 +113,14 @@ export const ResourcesGrid = () => {
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6 text-gradient">
-          {sectionTitle?.title || 'Tools & Resources'}
-        </h2>
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-gradient">
+            {sectionTitle?.title || 'Tools & Resources'}
+          </h2>
+          <Badge variant="outline" className="text-xs text-muted-foreground px-2 py-1">
+            {resources.length} tools
+          </Badge>
+        </div>
         {sectionTitle?.subtitle && (
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {sectionTitle.subtitle}
@@ -120,7 +134,10 @@ export const ResourcesGrid = () => {
           <Button
             key={category}
             variant={activeCategory === category ? "cyber" : "glow"}
-            onClick={() => setActiveCategory(category)}
+            onClick={() => {
+              setActiveCategory(category);
+              setShowAll(false); // Reset to show limited items when category changes
+            }}
             className="transition-all duration-300 capitalize"
           >
             {category}
@@ -130,7 +147,7 @@ export const ResourcesGrid = () => {
 
       {/* Resources Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredResources.map((resource, index) => {
+        {displayedResources.map((resource, index) => {
           const IconComponent = getIconComponent(resource.icon_name);
           
           return (
@@ -176,6 +193,20 @@ export const ResourcesGrid = () => {
           );
         })}
       </div>
+
+      {/* Load More Button */}
+      {!showAll && hasMore && (
+        <div className="text-center mt-12">
+          <Button 
+            variant="cyber" 
+            size="lg" 
+            onClick={() => setShowAll(true)}
+            className="px-8 py-3"
+          >
+            Load More Tools ({filteredResources.length - displayLimit} remaining)
+          </Button>
+        </div>
+      )}
     </section>
   );
 };
