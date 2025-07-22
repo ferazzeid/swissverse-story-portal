@@ -18,6 +18,8 @@ interface Story {
   story_image_url?: string;
   created_at: string;
   gradient_class: string;
+  meta_title?: string;
+  meta_description?: string;
 }
 
 export const StoryModal = () => {
@@ -53,6 +55,61 @@ export const StoryModal = () => {
 
     fetchStory();
   }, [slug, navigate]);
+
+  // Update SEO metadata for full page views
+  useEffect(() => {
+    if (!isModal && story) {
+      const title = story.meta_title || story.title;
+      const description = story.meta_description || story.content;
+      
+      document.title = title;
+      
+      // Update meta description
+      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement;
+      if (metaDesc) {
+        metaDesc.content = description;
+      } else {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        metaDesc.content = description;
+        document.head.appendChild(metaDesc);
+      }
+      
+      // Update Open Graph metadata
+      let ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement;
+      if (ogTitle) {
+        ogTitle.content = title;
+      } else {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        ogTitle.content = title;
+        document.head.appendChild(ogTitle);
+      }
+      
+      let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement;
+      if (ogDesc) {
+        ogDesc.content = description;
+      } else {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        ogDesc.content = description;
+        document.head.appendChild(ogDesc);
+      }
+      
+      // Update image if available
+      if (story.story_image_url) {
+        let ogImage = document.querySelector('meta[property="og:image"]') as HTMLMetaElement;
+        if (ogImage) {
+          ogImage.content = story.story_image_url;
+        } else {
+          ogImage = document.createElement('meta');
+          ogImage.setAttribute('property', 'og:image');
+          ogImage.content = story.story_image_url;
+          document.head.appendChild(ogImage);
+        }
+      }
+    }
+  }, [story, isModal]);
 
   const handleClose = () => {
     if (isModal) {

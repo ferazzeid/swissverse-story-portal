@@ -37,6 +37,12 @@ interface TimelineMoment {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  has_story: boolean;
+  story_slug: string | null;
+  full_story: string | null;
+  story_image_url: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
 }
 
 interface EditMomentData {
@@ -49,6 +55,12 @@ interface EditMomentData {
   icon_name: string;
   image_url: string;
   gradient_class: string;
+  has_story: boolean;
+  story_slug: string;
+  full_story: string;
+  story_image_url: string;
+  meta_title: string;
+  meta_description: string;
 }
 
 interface YearGroup {
@@ -114,7 +126,13 @@ export const TimelineManager = () => {
     highlight: '',
     icon_name: 'calendar',
     image_url: '',
-    gradient_class: 'from-purple-500 to-pink-500'
+    gradient_class: 'from-purple-500 to-pink-500',
+    has_story: false,
+    story_slug: '',
+    full_story: '',
+    story_image_url: '',
+    meta_title: '',
+    meta_description: ''
   });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -188,7 +206,13 @@ export const TimelineManager = () => {
       highlight: '',
       icon_name: 'calendar',
       image_url: '',
-      gradient_class: 'from-purple-500 to-pink-500'
+      gradient_class: 'from-purple-500 to-pink-500',
+      has_story: false,
+      story_slug: '',
+      full_story: '',
+      story_image_url: '',
+      meta_title: '',
+      meta_description: ''
     });
     setEditingMoment(null);
   };
@@ -205,7 +229,13 @@ export const TimelineManager = () => {
         highlight: moment.highlight,
         icon_name: moment.icon_name,
         image_url: moment.image_url || '',
-        gradient_class: moment.gradient_class
+        gradient_class: moment.gradient_class,
+        has_story: moment.has_story || false,
+        story_slug: moment.story_slug || '',
+        full_story: moment.full_story || '',
+        story_image_url: moment.story_image_url || '',
+        meta_title: moment.meta_title || '',
+        meta_description: moment.meta_description || ''
       });
     } else {
       resetForm();
@@ -243,7 +273,13 @@ export const TimelineManager = () => {
             highlight: momentData.highlight,
             icon_name: momentData.icon_name,
             image_url: momentData.image_url || null,
-            gradient_class: momentData.gradient_class
+            gradient_class: momentData.gradient_class,
+            has_story: momentData.has_story,
+            story_slug: momentData.has_story ? momentData.story_slug || null : null,
+            full_story: momentData.has_story ? momentData.full_story || null : null,
+            story_image_url: momentData.has_story ? momentData.story_image_url || null : null,
+            meta_title: momentData.has_story ? momentData.meta_title || null : null,
+            meta_description: momentData.has_story ? momentData.meta_description || null : null
           })
           .eq('id', editingMoment.id);
 
@@ -270,7 +306,13 @@ export const TimelineManager = () => {
             icon_name: momentData.icon_name,
             image_url: momentData.image_url || null,
             gradient_class: momentData.gradient_class,
-            display_order: maxOrder + 1
+            display_order: maxOrder + 1,
+            has_story: momentData.has_story,
+            story_slug: momentData.has_story ? momentData.story_slug || null : null,
+            full_story: momentData.has_story ? momentData.full_story || null : null,
+            story_image_url: momentData.has_story ? momentData.story_image_url || null : null,
+            meta_title: momentData.has_story ? momentData.meta_title || null : null,
+            meta_description: momentData.has_story ? momentData.meta_description || null : null
           });
 
         if (error) throw error;
@@ -563,6 +605,82 @@ export const TimelineManager = () => {
                     placeholder="Optional image URL"
                   />
                 </div>
+              </div>
+
+              {/* Story Section */}
+              <Separator />
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="has-story"
+                    checked={momentData.has_story}
+                    onCheckedChange={(checked) => setMomentData(prev => ({ 
+                      ...prev, 
+                      has_story: checked,
+                      story_slug: checked ? prev.story_slug || prev.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : ''
+                    }))}
+                  />
+                  <Label htmlFor="has-story">Enable Full Story</Label>
+                </div>
+
+                {momentData.has_story && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="story-slug">Story URL Slug</Label>
+                      <Input
+                        id="story-slug"
+                        value={momentData.story_slug}
+                        onChange={(e) => setMomentData(prev => ({ ...prev, story_slug: e.target.value }))}
+                        placeholder="story-url-slug"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Story will be available at: /story/{momentData.story_slug || 'story-url-slug'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="full-story">Full Story Content</Label>
+                      <Textarea
+                        id="full-story"
+                        value={momentData.full_story}
+                        onChange={(e) => setMomentData(prev => ({ ...prev, full_story: e.target.value }))}
+                        placeholder="Enter the complete story content (HTML supported)..."
+                        rows={6}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="story-image">Story Featured Image URL</Label>
+                      <Input
+                        id="story-image"
+                        value={momentData.story_image_url}
+                        onChange={(e) => setMomentData(prev => ({ ...prev, story_image_url: e.target.value }))}
+                        placeholder="Optional story featured image URL"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="meta-title">Meta Title (SEO)</Label>
+                      <Input
+                        id="meta-title"
+                        value={momentData.meta_title}
+                        onChange={(e) => setMomentData(prev => ({ ...prev, meta_title: e.target.value }))}
+                        placeholder="SEO title for this story"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="meta-description">Meta Description (SEO)</Label>
+                      <Textarea
+                        id="meta-description"
+                        value={momentData.meta_description}
+                        onChange={(e) => setMomentData(prev => ({ ...prev, meta_description: e.target.value }))}
+                        placeholder="SEO description for this story"
+                        rows={3}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Preview */}

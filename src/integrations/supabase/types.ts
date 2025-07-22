@@ -252,6 +252,8 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          meta_description: string | null
+          meta_title: string | null
           month: string | null
           story_image_url: string | null
           story_slug: string | null
@@ -272,6 +274,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           month?: string | null
           story_image_url?: string | null
           story_slug?: string | null
@@ -292,6 +296,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           month?: string | null
           story_image_url?: string | null
           story_slug?: string | null
