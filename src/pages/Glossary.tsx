@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,10 @@ interface GlossaryTerm {
 }
 
 export const Glossary = () => {
-  const { slug } = useParams<{ slug?: string }>();
-  const navigate = useNavigate();
+  const location = useLocation();
   const [terms, setTerms] = useState<GlossaryTerm[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedTerm, setSelectedTerm] = useState<GlossaryTerm | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,43 +42,11 @@ export const Glossary = () => {
       }
 
       setTerms(data || []);
-      
-      // If slug is provided, find and set the selected term
-      if (slug) {
-        const term = data?.find(t => t.term_slug === slug);
-        if (term) {
-          setSelectedTerm(term);
-        } else {
-          // Redirect to main glossary if term not found
-          navigate('/glossary');
-        }
-      }
-      
       setLoading(false);
     };
 
     fetchTerms();
-  }, [slug, navigate]);
-
-  // Update SEO when viewing individual terms
-  useEffect(() => {
-    if (selectedTerm) {
-      const title = selectedTerm.meta_title || `${selectedTerm.term} - SWISSVERSE Glossary`;
-      const description = selectedTerm.meta_description || selectedTerm.definition;
-      
-      document.title = title;
-      
-      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement;
-      if (metaDesc) {
-        metaDesc.content = description;
-      } else {
-        metaDesc = document.createElement('meta');
-        metaDesc.name = 'description';
-        metaDesc.content = description;
-        document.head.appendChild(metaDesc);
-      }
-    }
-  }, [selectedTerm]);
+  }, []);
 
   const categories = useMemo(() => {
     const cats = terms.reduce((acc, term) => {
@@ -119,87 +85,20 @@ export const Glossary = () => {
       metaverse: "from-purple-500 to-pink-500",
       technical: "from-blue-500 to-cyan-500",
       platforms: "from-green-500 to-emerald-500",
-      general: "from-gray-500 to-slate-500"
+      general: "from-gray-500 to-slate-500",
+      identity: "from-violet-500 to-purple-500",
+      infrastructure: "from-cyan-500 to-blue-500",
+      finance: "from-green-500 to-yellow-500",
+      gaming: "from-pink-500 to-red-500",
+      ai: "from-indigo-500 to-purple-500"
     };
     return gradients[category] || gradients.general;
-  };
-
-  const handleTermClick = (term: GlossaryTerm) => {
-    if (term.term_slug) {
-      navigate(`/glossary/${term.term_slug}`);
-      setSelectedTerm(term);
-    }
-  };
-
-  const handleBackToGlossary = () => {
-    navigate('/glossary');
-    setSelectedTerm(null);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Individual term view
-  if (selectedTerm) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="mb-6">
-            <Button onClick={handleBackToGlossary} variant="outline" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Glossary
-            </Button>
-            
-            <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-3xl font-bold text-primary">
-                    {selectedTerm.term}
-                  </CardTitle>
-                  <Badge 
-                    variant="outline" 
-                    className={`bg-gradient-to-r ${getCategoryGradient(selectedTerm.category)} text-white border-0`}
-                  >
-                    {selectedTerm.category}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg leading-loose text-foreground mb-6">
-                  {selectedTerm.definition}
-                </p>
-                
-                {selectedTerm.related_terms && selectedTerm.related_terms.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Related Terms</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedTerm.related_terms.map((relatedSlug, index) => {
-                        const relatedTerm = terms.find(t => t.term_slug === relatedSlug);
-                        return relatedTerm ? (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleTermClick(relatedTerm)}
-                            className="text-primary hover:bg-primary/10"
-                          >
-                            {relatedTerm.term}
-                            <ExternalLink className="w-3 h-3 ml-1" />
-                          </Button>
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
       </div>
     );
   }
@@ -211,8 +110,9 @@ export const Glossary = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            SWISSVERSE Glossary
+          <h1 className="text-4xl font-bold mb-4">
+            <span className="text-white uppercase">SWISS</span>
+            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">VERSE Glossary</span>
           </h1>
           <p className="text-lg text-muted-foreground">
             Your comprehensive guide to metaverse, blockchain, and Web3 terminology
@@ -270,30 +170,32 @@ export const Glossary = () => {
               <h2 className="text-2xl font-bold mb-4 text-primary">{letter}</h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {alphabeticalGroups[letter].map(term => (
-                  <Card 
+                  <Link
                     key={term.id}
-                    className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm"
-                    onClick={() => handleTermClick(term)}
+                    to={`/glossary/${term.term_slug}`}
+                    state={{ backgroundLocation: location }}
                   >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-bold text-primary">
-                          {term.term}
-                        </CardTitle>
-                        <Badge 
-                          variant="outline" 
-                          className={`bg-gradient-to-r ${getCategoryGradient(term.category)} text-white border-0`}
-                        >
-                          {term.category}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="line-clamp-3 text-foreground">
-                        {term.definition}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
+                    <Card className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg font-bold text-primary">
+                            {term.term}
+                          </CardTitle>
+                          <Badge 
+                            variant="outline" 
+                            className={`bg-gradient-to-r ${getCategoryGradient(term.category)} text-white border-0`}
+                          >
+                            {term.category}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription className="line-clamp-3 text-foreground">
+                          {term.definition}
+                        </CardDescription>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>

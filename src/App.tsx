@@ -8,6 +8,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { Glossary } from "./pages/Glossary";
 import { StoryModal } from "./components/StoryModal";
+import { GlossaryModal } from "./components/GlossaryModal";
 
 const queryClient = new QueryClient();
 
@@ -21,15 +22,16 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/glossary" element={<Glossary />} />
-        <Route path="/glossary/:slug" element={<Glossary />} />
+        <Route path="/glossary/:slug" element={<GlossaryModal />} />
         <Route path="/story/:slug" element={<StoryModal />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
-      {/* Modal routes - render on top when opened from timeline */}
+      {/* Modal routes - render on top when opened from main pages */}
       {backgroundLocation && (
         <Routes>
           <Route path="/story/:slug" element={<StoryModal />} />
+          <Route path="/glossary/:slug" element={<GlossaryModal />} />
         </Routes>
       )}
     </>
