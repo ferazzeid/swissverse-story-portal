@@ -617,7 +617,9 @@ export const TimelineManager = () => {
                     onCheckedChange={(checked) => setMomentData(prev => ({ 
                       ...prev, 
                       has_story: checked,
-                      story_slug: checked ? prev.story_slug || prev.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : ''
+                      story_slug: checked ? prev.story_slug || prev.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : '',
+                      meta_title: checked ? prev.meta_title || prev.title : '',
+                      meta_description: checked ? prev.meta_description || prev.content.substring(0, 150) + '...' : ''
                     }))}
                   />
                   <Label htmlFor="has-story">Enable Full Story</Label>
@@ -661,23 +663,23 @@ export const TimelineManager = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="meta-title">Meta Title (SEO)</Label>
-                      <Input
-                        id="meta-title"
-                        value={momentData.meta_title}
-                        onChange={(e) => setMomentData(prev => ({ ...prev, meta_title: e.target.value }))}
-                        placeholder="SEO title for this story"
-                      />
+                       <Input
+                         id="meta-title"
+                         value={momentData.meta_title}
+                         onChange={(e) => setMomentData(prev => ({ ...prev, meta_title: e.target.value }))}
+                         placeholder={`${momentData.title || 'Story title'} - SWISSVERSE Timeline`}
+                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="meta-description">Meta Description (SEO)</Label>
-                      <Textarea
-                        id="meta-description"
-                        value={momentData.meta_description}
-                        onChange={(e) => setMomentData(prev => ({ ...prev, meta_description: e.target.value }))}
-                        placeholder="SEO description for this story"
-                        rows={3}
-                      />
+                       <Textarea
+                         id="meta-description"
+                         value={momentData.meta_description}
+                         onChange={(e) => setMomentData(prev => ({ ...prev, meta_description: e.target.value }))}
+                         placeholder={`Discover the story of ${momentData.title || 'this moment'} in the SWISSVERSE timeline. ${momentData.content ? momentData.content.substring(0, 100) + '...' : 'Learn more about this important milestone.'}`}
+                         rows={3}
+                       />
                     </div>
                   </>
                 )}
