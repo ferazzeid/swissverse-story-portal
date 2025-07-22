@@ -112,10 +112,14 @@ export const StoryModal = () => {
   }, [story, isModal]);
 
   const handleClose = () => {
-    if (isModal) {
-      navigate(-1); // Go back to previous location
+    if (isModal && location.state?.backgroundLocation) {
+      // Navigate back to the background location (timeline)
+      navigate(location.state.backgroundLocation.pathname + location.state.backgroundLocation.search, { 
+        replace: true 
+      });
     } else {
-      navigate('/'); // Go to home if accessed directly
+      // For direct access, go to home page
+      navigate('/', { replace: true });
     }
   };
 
@@ -182,7 +186,7 @@ export const StoryModal = () => {
   // Render as modal if opened from timeline
   if (isModal) {
     return (
-      <Dialog open={true} onOpenChange={handleClose}>
+      <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="sr-only">{story.title}</DialogTitle>
