@@ -14,6 +14,7 @@ import { YouTubeManager } from "@/components/admin/YouTubeManager";
 import { ResourcesManager } from "@/components/admin/ResourcesManager";
 import { TimelineManager } from "@/components/admin/TimelineManager";
 import { StoryManager } from "@/components/admin/StoryManager";
+import { GlossaryManager } from "@/components/admin/GlossaryManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -142,7 +143,7 @@ const Admin = () => {
           </div>
           
           <Tabs defaultValue="home-page" className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="home-page">Home Page</TabsTrigger>
               <TabsTrigger value="gallery">Gallery</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -150,6 +151,7 @@ const Admin = () => {
               <TabsTrigger value="stories">Stories</TabsTrigger>
               <TabsTrigger value="youtube">YouTube</TabsTrigger>
               <TabsTrigger value="resources">Resources</TabsTrigger>
+              <TabsTrigger value="glossary">Glossary</TabsTrigger>
             </TabsList>
             
             <TabsContent value="home-page">
@@ -181,6 +183,10 @@ const Admin = () => {
             
             <TabsContent value="resources">
               <ResourcesManager />
+            </TabsContent>
+            
+            <TabsContent value="glossary">
+              <GlossaryManager />
             </TabsContent>
           </Tabs>
         </div>

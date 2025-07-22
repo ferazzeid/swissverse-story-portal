@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      glossary_terms: {
+        Row: {
+          category: string
+          created_at: string
+          definition: string
+          display_order: number
+          id: string
+          is_active: boolean
+          meta_description: string | null
+          meta_title: string | null
+          related_terms: string[] | null
+          term: string
+          term_slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          definition: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          related_terms?: string[] | null
+          term: string
+          term_slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          definition?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          related_terms?: string[] | null
+          term?: string
+          term_slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       home_page_content: {
         Row: {
           content: string | null

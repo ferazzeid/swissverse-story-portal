@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Globe, Twitter, Mail, Heart, Instagram, Youtube } from "lucide-react";
+import { Globe, Twitter, Mail, Heart, Instagram, Youtube, BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 import svLogo from "/lovable-uploads/39d7376b-c87b-4dbe-bac5-8d101bcef3a7.png";
 
 export const Footer = () => {
@@ -56,6 +57,16 @@ export const Footer = () => {
             >
               Join DCL Community
             </Button>
+            <Link to="/glossary">
+              <Button 
+                variant="outline" 
+                size="xl"
+                className="border-primary/50 hover:bg-primary/10"
+              >
+                <BookOpen className="mr-2" />
+                Glossary
+              </Button>
+            </Link>
           </div>
         </div>
 

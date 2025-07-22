@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import { Glossary } from "./pages/Glossary";
 import { StoryModal } from "./components/StoryModal";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,8 @@ const AppRoutes = () => {
       <Routes location={backgroundLocation || location}>
         <Route path="/" element={<Index />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/glossary" element={<Glossary />} />
+        <Route path="/glossary/:slug" element={<Glossary />} />
         <Route path="/story/:slug" element={<StoryModal />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
