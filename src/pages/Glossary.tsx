@@ -110,9 +110,14 @@ export const Glossary = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
+          <div className="mb-4">
+            <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Link>
+          </div>
           <h1 className="text-4xl font-bold mb-4">
-            <span className="text-white uppercase">SWISS</span>
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">VERSE Glossary</span>
+            <span className="text-white uppercase">SWISSVERSE Glossary</span>
           </h1>
           <p className="text-lg text-muted-foreground">
             Your comprehensive guide to metaverse, blockchain, and Web3 terminology
