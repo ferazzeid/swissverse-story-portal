@@ -90,7 +90,7 @@ export const StoryModal = () => {
 
         {story?.full_story && (
           <div 
-            className="text-foreground leading-relaxed"
+            className="text-foreground leading-loose text-base"
             dangerouslySetInnerHTML={{ __html: story.full_story }}
           />
         )}
