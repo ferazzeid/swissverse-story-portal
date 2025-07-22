@@ -252,7 +252,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
-          month: string
+          month: string | null
           story_image_url: string | null
           story_slug: string | null
           title: string
@@ -272,7 +272,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
-          month: string
+          month?: string | null
           story_image_url?: string | null
           story_slug?: string | null
           title: string
@@ -292,7 +292,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
-          month?: string
+          month?: string | null
           story_image_url?: string | null
           story_slug?: string | null
           title?: string
