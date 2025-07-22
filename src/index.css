@@ -249,4 +249,29 @@ All colors MUST be HSL.
     from { transform: translateX(100px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
   }
+
+  /* Story Content Formatting */
+  .story-content p {
+    @apply mb-4 leading-relaxed;
+  }
+  
+  .story-content p:last-child {
+    @apply mb-0;
+  }
+  
+  .story-content h1, .story-content h2, .story-content h3, .story-content h4, .story-content h5, .story-content h6 {
+    @apply mt-6 mb-4 font-semibold;
+  }
+  
+  .story-content h1:first-child, .story-content h2:first-child, .story-content h3:first-child {
+    @apply mt-0;
+  }
+  
+  .story-content ul, .story-content ol {
+    @apply mb-4 ml-6;
+  }
+  
+  .story-content li {
+    @apply mb-2;
+  }
 }
