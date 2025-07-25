@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      configurable_links: {
+        Row: {
+          button_size: string
+          button_variant: string
+          created_at: string
+          display_order: number
+          icon_name: string
+          id: string
+          is_active: boolean
+          link_key: string
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          button_size?: string
+          button_variant?: string
+          created_at?: string
+          display_order?: number
+          icon_name: string
+          id?: string
+          is_active?: boolean
+          link_key: string
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          button_size?: string
+          button_variant?: string
+          created_at?: string
+          display_order?: number
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          link_key?: string
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       gallery_images: {
         Row: {
           alt_text: string
