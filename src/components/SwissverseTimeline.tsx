@@ -347,7 +347,7 @@ export const SwissverseTimeline = () => {
                   </div>
                   
                   {/* Year Title - responsive positioning */}
-                  <div className="absolute md:left-32 left-1/2 md:top-1/2 top-full md:transform md:-translate-y-1/2 transform -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0">
+                  <div className="absolute md:left-32 left-1/2 md:top-1/2 top-full md:transform md:-translate-y-1/2 transform -translate-x-1/2 md:translate-x-0 mt-4 md:mt-0 mb-8 md:mb-0">
                     <h3 className="text-lg md:text-xl font-bold text-gradient whitespace-nowrap bg-background/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50 shadow-lg">
                       {yearData.title}
                     </h3>
