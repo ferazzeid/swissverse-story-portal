@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 import { Glossary } from "./pages/Glossary";
 import { StoryModal } from "./components/StoryModal";
 import { GlossaryModal } from "./components/GlossaryModal";
@@ -21,6 +22,7 @@ const AppRoutes = () => {
       <Routes location={backgroundLocation || location}>
         <Route path="/" element={<Index />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/glossary" element={<Glossary />} />
         <Route path="/glossary/:slug" element={<GlossaryModal />} />
         <Route path="/story/:slug" element={<StoryModal />} />
