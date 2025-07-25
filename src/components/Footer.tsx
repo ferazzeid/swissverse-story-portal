@@ -1,15 +1,59 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Globe, Twitter, Mail, Heart, Instagram, Youtube, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { icons } from 'lucide-react';
 import svLogo from "/lovable-uploads/39d7376b-c87b-4dbe-bac5-8d101bcef3a7.png";
 
+interface ConfigurableLink {
+  id: string;
+  link_key: string;
+  title: string;
+  url: string;
+  icon_name: string;
+  button_variant: string;
+  button_size: string;
+  is_active: boolean;
+  display_order: number;
+}
+
 export const Footer = () => {
+  const [links, setLinks] = useState<ConfigurableLink[]>([]);
+
+  useEffect(() => {
+    fetchLinks();
+  }, []);
+
+  const fetchLinks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('configurable_links')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (error) throw error;
+      setLinks(data || []);
+    } catch (error) {
+      console.error('Error fetching links:', error);
+    }
+  };
+
+  const getLink = (linkKey: string) => {
+    return links.find(link => link.link_key === linkKey);
+  };
+
+  const getIcon = (iconName: string) => {
+    return icons[iconName as keyof typeof icons] || Globe;
+  };
+
   const socialLinks = [
-    { icon: Twitter, url: "https://x.com/swissverse", label: "X" },
-    { icon: Instagram, url: "https://www.instagram.com/swiss.verse/", label: "Instagram" },
-    { icon: Youtube, url: "https://www.youtube.com/@SWISSVERSE", label: "YouTube" },
-    { icon: Mail, url: "mailto:swiss@dcl.business", label: "Email" },
-  ];
+    getLink('footer_social_x'),
+    getLink('footer_social_instagram'),
+    getLink('footer_social_youtube'),
+    getLink('footer_social_email')
+  ].filter(Boolean);
 
 
   return (
@@ -42,31 +86,43 @@ export const Footer = () => {
             Pioneering the Metaverse
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              variant="cyber" 
-              size="xl"
-              onClick={() => window.open("https://world.swissverse.org", "_blank")}
-            >
-              <Globe className="mr-2" />
-              Visit Metaverse
-            </Button>
-            <Button 
-              variant="glow" 
-              size="xl"
-              onClick={() => window.open("https://decentraland.org/", "_blank")}
-            >
-              Join DCL Community
-            </Button>
-            <Link to="/glossary">
-              <Button 
-                variant="outline" 
-                size="xl"
-                className="border-primary/50 hover:bg-primary/10"
-              >
-                <BookOpen className="mr-2" />
-                Glossary
-              </Button>
-            </Link>
+            {[
+              getLink('footer_visit_metaverse'),
+              getLink('footer_join_dcl'),
+              getLink('footer_glossary')
+            ].filter(Boolean).map((link) => {
+              if (!link) return null;
+              const IconComponent = getIcon(link.icon_name);
+              
+              if (link.url.startsWith('/')) {
+                // Internal link
+                return (
+                  <Link key={link.id} to={link.url}>
+                    <Button 
+                      variant={link.button_variant as any} 
+                      size={link.button_size as any}
+                      className={link.button_variant === 'outline' ? "border-primary/50 hover:bg-primary/10" : ""}
+                    >
+                      <IconComponent className="mr-2" />
+                      {link.title}
+                    </Button>
+                  </Link>
+                );
+              } else {
+                // External link
+                return (
+                  <Button 
+                    key={link.id}
+                    variant={link.button_variant as any} 
+                    size={link.button_size as any}
+                    onClick={() => window.open(link.url, "_blank")}
+                  >
+                    <IconComponent className="mr-2" />
+                    {link.title}
+                  </Button>
+                );
+              }
+            })}
           </div>
         </div>
 
@@ -85,17 +141,21 @@ export const Footer = () => {
               Pioneering the Metaverse
             </p>
             <div className="flex gap-3 justify-center">
-              {socialLinks.map((social, index) => (
-                <Button
-                  key={index}
-                  variant="glow"
-                  size="icon"
-                  onClick={() => window.open(social.url, "_blank")}
-                  className="hover:scale-110 transition-transform"
-                >
-                  <social.icon size={18} />
-                </Button>
-              ))}
+              {socialLinks.map((social) => {
+                if (!social) return null;
+                const IconComponent = getIcon(social.icon_name);
+                return (
+                  <Button
+                    key={social.id}
+                    variant={social.button_variant as any}
+                    size={social.button_size as any}
+                    onClick={() => window.open(social.url, "_blank")}
+                    className="hover:scale-110 transition-transform"
+                  >
+                    <IconComponent size={18} />
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </div>

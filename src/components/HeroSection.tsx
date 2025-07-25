@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Sparkles, Globe, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { icons } from 'lucide-react';
 
 interface HomePageContent {
   section_key: string;
@@ -10,9 +11,22 @@ interface HomePageContent {
   tag_type: string;
 }
 
+interface ConfigurableLink {
+  id: string;
+  link_key: string;
+  title: string;
+  url: string;
+  icon_name: string;
+  button_variant: string;
+  button_size: string;
+  is_active: boolean;
+  display_order: number;
+}
+
 export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [content, setContent] = useState<HomePageContent[]>([]);
+  const [links, setLinks] = useState<ConfigurableLink[]>([]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -25,6 +39,7 @@ export const HeroSection = () => {
 
   useEffect(() => {
     fetchHomePageContent();
+    fetchLinks();
   }, []);
 
   const fetchHomePageContent = async () => {
@@ -41,8 +56,31 @@ export const HeroSection = () => {
     }
   };
 
+  const fetchLinks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('configurable_links')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (error) throw error;
+      setLinks(data || []);
+    } catch (error) {
+      console.error('Error fetching links:', error);
+    }
+  };
+
   const getContent = (sectionKey: string) => {
     return content.find(item => item.section_key === sectionKey);
+  };
+
+  const getLink = (linkKey: string) => {
+    return links.find(link => link.link_key === linkKey);
+  };
+
+  const getIcon = (iconName: string) => {
+    return icons[iconName as keyof typeof icons] || Globe;
   };
 
   const renderTitle = (sectionKey: string, defaultText: string, className: string = "") => {
@@ -152,24 +190,33 @@ export const HeroSection = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button 
-            variant="cyber" 
-            size="xl" 
-            className="group"
-            onClick={() => window.open('https://hyperfy.io/swissverse', '_blank')}
-          >
-            <Globe className="mr-2 group-hover:rotate-12 transition-transform" />
-            Visit the Metaverse
-          </Button>
-          <Button 
-            variant="glow" 
-            size="xl" 
-            className="group"
-            onClick={() => window.open('https://x.com/swissverse', '_blank')}
-          >
-            <Sparkles className="mr-2 group-hover:scale-110 transition-transform" />
-            Follow on X
-          </Button>
+          {[
+            getLink('hero_visit_metaverse'),
+            getLink('hero_follow_x')
+          ].filter(Boolean).map((link) => {
+            if (!link) return null;
+            const IconComponent = getIcon(link.icon_name);
+            return (
+              <Button 
+                key={link.id}
+                variant={link.button_variant as any} 
+                size={link.button_size as any} 
+                className="group"
+                onClick={() => {
+                  if (link.url.startsWith('/')) {
+                    // Internal link - use navigate
+                    window.location.href = link.url;
+                  } else {
+                    // External link - open in new tab
+                    window.open(link.url, '_blank');
+                  }
+                }}
+              >
+                <IconComponent className="mr-2 group-hover:rotate-12 transition-transform" />
+                {link.title}
+              </Button>
+            );
+          })}
         </div>
 
         {/* Scroll Indicator */}
