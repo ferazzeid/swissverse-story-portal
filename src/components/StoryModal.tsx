@@ -157,13 +157,13 @@ export const StoryModal = () => {
         )}
       </div>
 
-      <div className="flex justify-between items-center pt-6 border-t border-border">
-        <Button onClick={handleClose} variant="outline">
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center pt-6 border-t border-border">
+        <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Timeline
         </Button>
         
-        <Button onClick={() => window.open(`/story/${slug}`, '_blank')} variant="ghost">
+        <Button onClick={() => window.open(`/story/${slug}`, '_blank')} variant="ghost" className="w-full sm:w-auto">
           <ExternalLink className="w-4 h-4 mr-2" />
           {isModal ? 'Open in New Tab' : 'Share Story'}
         </Button>
@@ -187,7 +187,7 @@ export const StoryModal = () => {
   if (isModal) {
     return (
       <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4 w-[calc(100vw-2rem)] md:w-full">
           <DialogHeader>
             <DialogTitle className="sr-only">{story.title}</DialogTitle>
           </DialogHeader>
