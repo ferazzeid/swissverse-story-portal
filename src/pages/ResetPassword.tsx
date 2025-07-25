@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,24 +11,60 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [sessionEstablished, setSessionEstablished] = useState(false);
+  const [isValidating, setIsValidating] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if we have the required tokens in the URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (!accessToken || !refreshToken) {
-      toast({
-        title: "Invalid Reset Link",
-        description: "This password reset link is invalid or has expired.",
-        variant: "destructive",
-      });
-      navigate('/admin');
-    }
-  }, [searchParams, navigate, toast]);
+    const establishSession = async () => {
+      try {
+        // Parse URL fragment for Supabase tokens
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+
+        if (type !== 'recovery' || !accessToken || !refreshToken) {
+          toast({
+            title: "Invalid Reset Link",
+            description: "This password reset link is invalid or has expired.",
+            variant: "destructive",
+          });
+          navigate('/admin');
+          return;
+        }
+
+        // Establish session with Supabase
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (error) {
+          toast({
+            title: "Session Error",
+            description: "Failed to establish session. Please try again.",
+            variant: "destructive",
+          });
+          navigate('/admin');
+        } else {
+          setSessionEstablished(true);
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while processing the reset link.",
+          variant: "destructive",
+        });
+        navigate('/admin');
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    establishSession();
+  }, [navigate, toast]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +118,42 @@ const ResetPassword = () => {
     }
   };
 
+  if (isValidating) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="mt-4 text-muted-foreground">Validating reset link...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!sessionEstablished) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center">Invalid Reset Link</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground mb-4">
+              This password reset link is invalid or has expired.
+            </p>
+            <Button 
+              className="w-full" 
+              onClick={() => navigate('/admin')}
+            >
+              Go to Admin
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -117,7 +189,7 @@ const ResetPassword = () => {
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={loading || !newPassword || !confirmPassword}
+              disabled={loading || !newPassword || !confirmPassword || !sessionEstablished}
             >
               {loading ? "Updating Password..." : "Update Password"}
             </Button>
