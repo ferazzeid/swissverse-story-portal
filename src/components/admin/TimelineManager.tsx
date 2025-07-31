@@ -249,11 +249,11 @@ export const TimelineManager = () => {
   };
 
   const saveMoment = async () => {
-    if (!momentData.title || !momentData.content || !momentData.month || !momentData.year_title) {
+    if (!momentData.title || !momentData.content || !momentData.year_title) {
       toast({
         variant: "destructive",
         title: "Validation Error",
-        description: "Year title, month, title, and content are required",
+        description: "Year title, title, and content are required",
       });
       return;
     }
@@ -485,12 +485,12 @@ export const TimelineManager = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="month">Month/Period *</Label>
+                  <Label htmlFor="month">Month/Period</Label>
                   <Input
                     id="month"
                     value={momentData.month}
                     onChange={(e) => setMomentData(prev => ({ ...prev, month: e.target.value }))}
-                    placeholder="March, Early 2024, Q1"
+                    placeholder="March, Early 2024, Q1 (optional)"
                   />
                 </div>
               </div>
