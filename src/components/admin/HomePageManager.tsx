@@ -25,9 +25,16 @@ interface SeoMetadata {
   meta_description: string;
 }
 
+interface HeroLink {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export const HomePageManager = () => {
   const [homeContent, setHomeContent] = useState<HomePageContent[]>([]);
   const [seoData, setSeoData] = useState<SeoMetadata | null>(null);
+  const [heroLinks, setHeroLinks] = useState<HeroLink[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -58,8 +65,19 @@ export const HomePageManager = () => {
 
       if (seoError) throw seoError;
 
+      // Fetch hero links
+      const { data: linksData, error: linksError } = await supabase
+        .from('configurable_links')
+        .select('id, title, url')
+        .in('link_key', ['visit_metaverse', 'follow_x'])
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (linksError) throw linksError;
+
       setHomeContent(contentData || []);
       setSeoData(seoData);
+      setHeroLinks(linksData || []);
     } catch (error) {
       console.error('Error fetching home page data:', error);
       toast({
@@ -84,6 +102,16 @@ export const HomePageManager = () => {
 
   const updateSeoData = (field: string, value: string) => {
     setSeoData(prev => prev ? { ...prev, [field]: value } : null);
+  };
+
+  const updateHeroLink = (id: string, field: string, value: string) => {
+    setHeroLinks(prev => 
+      prev.map(link => 
+        link.id === id 
+          ? { ...link, [field]: value }
+          : link
+      )
+    );
   };
 
   const saveChanges = async () => {
@@ -112,6 +140,19 @@ export const HomePageManager = () => {
             meta_description: seoData.meta_description
           })
           .eq('id', seoData.id);
+
+        if (error) throw error;
+      }
+
+      // Update hero links
+      for (const link of heroLinks) {
+        const { error } = await supabase
+          .from('configurable_links')
+          .update({
+            title: link.title,
+            url: link.url
+          })
+          .eq('id', link.id);
 
         if (error) throw error;
       }
@@ -165,6 +206,38 @@ export const HomePageManager = () => {
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      {/* Hero Links */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Hero Section Links</CardTitle>
+          <CardDescription>
+            Manage the main action buttons in the hero section
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {heroLinks.map((link) => (
+            <div key={link.id} className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Button Text</Label>
+                <Input
+                  value={link.title}
+                  onChange={(e) => updateHeroLink(link.id, 'title', e.target.value)}
+                  placeholder="Enter button text"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>URL</Label>
+                <Input
+                  value={link.url}
+                  onChange={(e) => updateHeroLink(link.id, 'url', e.target.value)}
+                  placeholder="Enter URL"
+                />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       {/* Hero Section Content */}
       <Card>
