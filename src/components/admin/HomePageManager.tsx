@@ -69,7 +69,7 @@ export const HomePageManager = () => {
       const { data: linksData, error: linksError } = await supabase
         .from('configurable_links')
         .select('id, title, url')
-        .in('link_key', ['visit_metaverse', 'follow_x'])
+        .in('link_key', ['hero_visit_metaverse', 'hero_follow_x'])
         .eq('is_active', true)
         .order('display_order');
 
