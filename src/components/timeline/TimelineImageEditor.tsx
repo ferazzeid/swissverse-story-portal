@@ -49,7 +49,7 @@ export const TimelineImageEditor = ({
 
   return (
     <>
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-50">
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1" style={{ zIndex: 9999 }}>
         {currentImageUrl ? (
           // Show edit and delete buttons when image exists
           <>
