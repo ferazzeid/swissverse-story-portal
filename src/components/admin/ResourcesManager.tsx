@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface Resource {
   id: string;
@@ -188,8 +189,6 @@ export const ResourcesManager = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this resource?')) return;
-
     try {
       const { error } = await supabase
         .from('resources')
@@ -197,11 +196,12 @@ export const ResourcesManager = () => {
         .eq('id', id);
 
       if (error) throw error;
+      
+      await fetchResources();
       toast({
         title: "Success",
         description: "Resource deleted successfully",
       });
-      fetchResources();
     } catch (error) {
       console.error('Error deleting resource:', error);
       toast({
@@ -543,13 +543,30 @@ export const ResourcesManager = () => {
                     >
                       <Edit2 size={16} />
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(resource.id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Resource</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{resource.title}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(resource.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               ))

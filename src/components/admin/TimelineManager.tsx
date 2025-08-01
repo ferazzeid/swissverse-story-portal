@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -363,8 +364,6 @@ export const TimelineManager = () => {
   };
 
   const deleteMoment = async (moment: TimelineMoment) => {
-    if (!confirm(`Are you sure you want to delete "${moment.title}"?`)) return;
-
     try {
       const { error } = await supabase
         .from('timeline_content')
@@ -837,22 +836,39 @@ export const TimelineManager = () => {
                                   />
                                 </div>
                                 
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openDialog(moment)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => deleteMoment(moment)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
+                                 <div className="flex gap-2">
+                                   <Button
+                                     variant="outline"
+                                     size="sm"
+                                     onClick={() => openDialog(moment)}
+                                   >
+                                     <Edit className="h-4 w-4" />
+                                   </Button>
+                                   <AlertDialog>
+                                     <AlertDialogTrigger asChild>
+                                       <Button
+                                         variant="destructive"
+                                         size="sm"
+                                       >
+                                         <Trash2 className="h-4 w-4" />
+                                       </Button>
+                                     </AlertDialogTrigger>
+                                     <AlertDialogContent>
+                                       <AlertDialogHeader>
+                                         <AlertDialogTitle>Delete Timeline Moment</AlertDialogTitle>
+                                         <AlertDialogDescription>
+                                           Are you sure you want to delete "{moment.title}"? This action cannot be undone.
+                                         </AlertDialogDescription>
+                                       </AlertDialogHeader>
+                                       <AlertDialogFooter>
+                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                         <AlertDialogAction onClick={() => deleteMoment(moment)}>
+                                           Delete
+                                         </AlertDialogAction>
+                                       </AlertDialogFooter>
+                                     </AlertDialogContent>
+                                   </AlertDialog>
+                                 </div>
                               </div>
                             </div>
                           </div>

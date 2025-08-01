@@ -11,6 +11,8 @@ import { GlossaryInlineEditor } from "@/components/glossary/GlossaryInlineEditor
 import { GlossaryInsertIndicator } from "@/components/glossary/GlossaryInsertIndicator";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { Search, ArrowLeft, ExternalLink, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface GlossaryTerm {
   id: string;
@@ -105,9 +107,9 @@ export const Glossary = () => {
     ));
   };
 
+  const { toast } = useToast();
+
   const handleDeleteTerm = async (termId: string) => {
-    if (!window.confirm('Are you sure you want to delete this term?')) return;
-    
     try {
       const { error } = await supabase
         .from('glossary_terms')
@@ -117,8 +119,17 @@ export const Glossary = () => {
       if (error) throw error;
       
       setTerms(prev => prev.filter(term => term.id !== termId));
+      toast({
+        title: "Success",
+        description: "Term deleted successfully",
+      });
     } catch (error) {
       console.error('Error deleting term:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete term",
+        variant: "destructive",
+      });
     }
   };
 
@@ -284,18 +295,35 @@ export const Glossary = () => {
                     </Link>
                     
                     {isAdmin && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDeleteTerm(term.id);
-                        }}
-                        className="absolute -top-2 -right-2 opacity-0 group-hover/card:opacity-100 transition-opacity h-6 w-6 p-0"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            className="absolute -top-2 -right-2 opacity-0 group-hover/card:opacity-100 transition-opacity h-6 w-6 p-0"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Term</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{term.term}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteTerm(term.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     )}
                     
                     {isAdmin && index < alphabeticalGroups[letter].length - 1 && (
