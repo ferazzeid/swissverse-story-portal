@@ -20,7 +20,7 @@ export const ResourceInsertIndicator = ({
   return (
     <>
       <div 
-        className="relative h-6 flex items-center justify-center group col-span-full"
+        className="relative h-6 flex items-center justify-center group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

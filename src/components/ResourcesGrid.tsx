@@ -183,10 +183,12 @@ export const ResourcesGrid = () => {
       {/* Resources Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isAdmin && (
-          <ResourceInsertIndicator
-            displayOrder={0}
-            onResourceAdded={handleResourceAdded}
-          />
+          <div className="lg:col-span-3 md:col-span-2">
+            <ResourceInsertIndicator
+              displayOrder={0}
+              onResourceAdded={handleResourceAdded}
+            />
+          </div>
         )}
         
         {displayedResources.map((resource, index) => {
@@ -196,113 +198,128 @@ export const ResourcesGrid = () => {
             : resource.display_order + 10;
           
           return (
-            <div key={resource.id} className="contents">
-              <Card
-                className={`card-glow p-6 transition-all duration-500 group ${
-                  hoveredResource === resource.id ? "scale-105" : ""
-                }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-                onMouseEnter={() => setHoveredResource(resource.id)}
-                onMouseLeave={() => setHoveredResource(null)}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${getCategoryGradient(resource.category)}`}>
-                    {isAdmin ? (
-                      <ResourceIconSelector
-                        resourceId={resource.id}
-                        currentIcon={resource.icon_name}
-                        onUpdate={(newIcon) => handleResourceUpdate(resource.id, 'icon_name', newIcon)}
-                      />
-                    ) : (
-                      <IconComponent size={24} className="text-white" />
-                    )}
+            <>
+              <div key={resource.id} className="relative">
+                <Card
+                  className={`card-glow p-6 transition-all duration-500 group ${
+                    hoveredResource === resource.id ? "scale-105" : ""
+                  }`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onMouseEnter={() => setHoveredResource(resource.id)}
+                  onMouseLeave={() => setHoveredResource(null)}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${getCategoryGradient(resource.category)}`}>
+                      {isAdmin ? (
+                        <ResourceIconSelector
+                          resourceId={resource.id}
+                          currentIcon={resource.icon_name}
+                          onUpdate={(newIcon) => handleResourceUpdate(resource.id, 'icon_name', newIcon)}
+                        />
+                      ) : (
+                        <IconComponent size={24} className="text-white" />
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="mb-2">
-                  {isAdmin ? (
-                    <ResourceInlineEditor
-                      resourceId={resource.id}
-                      field="title"
-                      currentValue={resource.title}
-                      onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
-                      className="text-lg font-bold group-hover:text-primary transition-colors"
-                    />
-                  ) : (
-                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
-                      {resource.title}
-                    </h3>
-                  )}
-                </div>
-
-                <div className="mb-3">
-                  {isAdmin ? (
-                    <ResourceInlineEditor
-                      resourceId={resource.id}
-                      field="category"
-                      currentValue={resource.category}
-                      onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
-                      className="capitalize"
-                    />
-                  ) : (
-                    <Badge variant="outline" className="capitalize">
-                      {resource.category}
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="mb-6">
-                  {isAdmin ? (
-                    <ResourceInlineEditor
-                      resourceId={resource.id}
-                      field="description"
-                      currentValue={resource.description}
-                      onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
-                      className="text-muted-foreground text-sm leading-relaxed"
-                      multiline
-                    />
-                  ) : (
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {resource.description}
-                    </p>
-                  )}
-                </div>
-
-                {resource.link_url && (
-                  <div>
+                  <div className="mb-2">
                     {isAdmin ? (
                       <ResourceInlineEditor
                         resourceId={resource.id}
-                        field="link_url"
-                        currentValue={resource.link_url}
+                        field="title"
+                        currentValue={resource.title}
                         onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
-                        className="text-sm text-blue-500 hover:text-blue-600"
+                        className="text-lg font-bold group-hover:text-primary transition-colors"
                       />
                     ) : (
-                      <Button 
-                        variant="glow" 
-                        size="sm" 
-                        className="w-full group"
-                        onClick={() => window.open(resource.link_url!, "_blank")}
-                      >
-                        Visit Tool
-                        <ExternalLink size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Button>
+                      <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
+                        {resource.title}
+                      </h3>
                     )}
                   </div>
-                )}
-              </Card>
 
-              {isAdmin && (
-                <ResourceInsertIndicator
-                  afterResourceId={resource.id}
-                  displayOrder={nextDisplayOrder}
-                  onResourceAdded={handleResourceAdded}
-                />
+                  <div className="mb-3">
+                    {isAdmin ? (
+                      <ResourceInlineEditor
+                        resourceId={resource.id}
+                        field="category"
+                        currentValue={resource.category}
+                        onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
+                        className="capitalize"
+                      />
+                    ) : (
+                      <Badge variant="outline" className="capitalize">
+                        {resource.category}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="mb-6">
+                    {isAdmin ? (
+                      <ResourceInlineEditor
+                        resourceId={resource.id}
+                        field="description"
+                        currentValue={resource.description}
+                        onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
+                        className="text-muted-foreground text-sm leading-relaxed"
+                        multiline
+                      />
+                    ) : (
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {resource.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {resource.link_url && (
+                    <div>
+                      {isAdmin ? (
+                        <ResourceInlineEditor
+                          resourceId={resource.id}
+                          field="link_url"
+                          currentValue={resource.link_url}
+                          onUpdate={(field, newValue) => handleResourceUpdate(resource.id, field, newValue)}
+                          className="text-sm text-blue-500 hover:text-blue-600"
+                        />
+                      ) : (
+                        <Button 
+                          variant="glow" 
+                          size="sm" 
+                          className="w-full group"
+                          onClick={() => window.open(resource.link_url!, "_blank")}
+                        >
+                          Visit Tool
+                          <ExternalLink size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </Card>
+              </div>
+
+              {isAdmin && (index + 1) % 3 === 0 && (
+                <div className="lg:col-span-3 md:col-span-2">
+                  <ResourceInsertIndicator
+                    afterResourceId={resource.id}
+                    displayOrder={nextDisplayOrder}
+                    onResourceAdded={handleResourceAdded}
+                  />
+                </div>
               )}
-            </div>
+            </>
           );
         })}
+        
+        {/* Insert indicator after the last resource if it's not at the end of a row */}
+        {isAdmin && displayedResources.length % 3 !== 0 && displayedResources.length > 0 && (
+          <div className="lg:col-span-3 md:col-span-2">
+            <ResourceInsertIndicator
+              afterResourceId={displayedResources[displayedResources.length - 1]?.id}
+              displayOrder={displayedResources[displayedResources.length - 1]?.display_order + 10}
+              onResourceAdded={handleResourceAdded}
+            />
+          </div>
+        )}
       </div>
 
       {/* Load More Button */}
