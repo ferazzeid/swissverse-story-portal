@@ -99,9 +99,9 @@ export const Footer = () => {
                 return (
                   <Link key={link.id} to={link.url}>
                     <Button 
-                      variant={link.button_variant as any} 
+                      variant={link.button_variant === 'outline' ? 'default' : link.button_variant as any} 
                       size={link.button_size as any}
-                      className={link.button_variant === 'outline' ? "border-primary/50 hover:bg-primary/10" : ""}
+                      className="text-white hover:text-white"
                     >
                       <IconComponent className="mr-2" />
                       {link.title}

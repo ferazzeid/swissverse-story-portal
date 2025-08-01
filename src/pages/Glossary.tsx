@@ -7,7 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SEOHead } from "@/components/SEOHead";
-import { Search, ArrowLeft, ExternalLink } from "lucide-react";
+import { GlossaryInlineEditor } from "@/components/glossary/GlossaryInlineEditor";
+import { GlossaryInsertIndicator } from "@/components/glossary/GlossaryInsertIndicator";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { Search, ArrowLeft, ExternalLink, Trash2 } from "lucide-react";
 
 interface GlossaryTerm {
   id: string;
@@ -27,6 +30,7 @@ export const Glossary = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAdminStatus();
 
   useEffect(() => {
     const fetchTerms = async () => {
@@ -93,6 +97,45 @@ export const Glossary = () => {
       ai: "from-indigo-500 to-purple-500"
     };
     return gradients[category] || gradients.general;
+  };
+
+  const handleUpdateTerm = (termId: string, field: string, value: string) => {
+    setTerms(prev => prev.map(term => 
+      term.id === termId ? { ...term, [field]: value } : term
+    ));
+  };
+
+  const handleDeleteTerm = async (termId: string) => {
+    if (!window.confirm('Are you sure you want to delete this term?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('glossary_terms')
+        .delete()
+        .eq('id', termId);
+
+      if (error) throw error;
+      
+      setTerms(prev => prev.filter(term => term.id !== termId));
+    } catch (error) {
+      console.error('Error deleting term:', error);
+    }
+  };
+
+  const handleTermAdded = () => {
+    // Refresh the terms list
+    const fetchTerms = async () => {
+      const { data, error } = await supabase
+        .from('glossary_terms')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (!error && data) {
+        setTerms(data);
+      }
+    };
+    fetchTerms();
   };
 
   if (loading) {
@@ -171,38 +214,105 @@ export const Glossary = () => {
         {/* Terms Grid */}
         <div className="space-y-8">
           {Object.keys(alphabeticalGroups).sort().map(letter => (
-            <div key={letter} id={`letter-${letter}`}>
+            <div key={letter} id={`letter-${letter}`} className="group">
               <h2 className="text-2xl font-bold mb-4 text-primary">{letter}</h2>
+              {isAdmin && (
+                <GlossaryInsertIndicator
+                  afterDisplayOrder={-1}
+                  onTermAdded={handleTermAdded}
+                />
+              )}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {alphabeticalGroups[letter].map(term => (
-                  <Link
-                    key={term.id}
-                    to={`/glossary/${term.term_slug}`}
-                    state={{ backgroundLocation: location }}
-                  >
-                    <Card className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg font-bold text-primary">
-                            {term.term}
-                          </CardTitle>
-                          <Badge 
-                            variant="outline" 
-                            className={`bg-gradient-to-r ${getCategoryGradient(term.category)} text-white border-0`}
-                          >
-                            {term.category}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription className="line-clamp-3 text-foreground">
-                          {term.definition}
-                        </CardDescription>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                {alphabeticalGroups[letter].map((term, index) => (
+                  <div key={term.id} className="relative group/card">
+                    <Link
+                      to={`/glossary/${term.term_slug}`}
+                      state={{ backgroundLocation: location }}
+                      className="block"
+                    >
+                      <Card className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm">
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg font-bold text-primary">
+                              {isAdmin ? (
+                                <GlossaryInlineEditor
+                                  termId={term.id}
+                                  field="term"
+                                  currentValue={term.term}
+                                  onUpdate={(field, value) => handleUpdateTerm(term.id, field, value)}
+                                />
+                              ) : (
+                                term.term
+                              )}
+                            </CardTitle>
+                            <div className="flex items-center gap-2">
+                              {isAdmin ? (
+                                <GlossaryInlineEditor
+                                  termId={term.id}
+                                  field="category"
+                                  currentValue={term.category}
+                                  onUpdate={(field, value) => handleUpdateTerm(term.id, field, value)}
+                                  className={`bg-gradient-to-r ${getCategoryGradient(term.category)} text-white border-0 px-2 py-1 rounded text-xs`}
+                                />
+                              ) : (
+                                <Badge 
+                                  variant="outline" 
+                                  className={`bg-gradient-to-r ${getCategoryGradient(term.category)} text-white border-0`}
+                                >
+                                  {term.category}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="line-clamp-3 text-foreground">
+                            {isAdmin ? (
+                              <GlossaryInlineEditor
+                                termId={term.id}
+                                field="definition"
+                                currentValue={term.definition}
+                                onUpdate={(field, value) => handleUpdateTerm(term.id, field, value)}
+                                multiline
+                              />
+                            ) : (
+                              term.definition
+                            )}
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    
+                    {isAdmin && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDeleteTerm(term.id);
+                        }}
+                        className="absolute -top-2 -right-2 opacity-0 group-hover/card:opacity-100 transition-opacity h-6 w-6 p-0"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    )}
+                    
+                    {isAdmin && index < alphabeticalGroups[letter].length - 1 && (
+                      <GlossaryInsertIndicator
+                        afterDisplayOrder={term.display_order}
+                        onTermAdded={handleTermAdded}
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
+              {isAdmin && alphabeticalGroups[letter].length > 0 && (
+                <GlossaryInsertIndicator
+                  afterDisplayOrder={Math.max(...alphabeticalGroups[letter].map(t => t.display_order))}
+                  onTermAdded={handleTermAdded}
+                />
+              )}
             </div>
           ))}
         </div>
