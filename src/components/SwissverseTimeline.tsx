@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { TimelineImageEditor } from "./timeline/TimelineImageEditor";
 
 // Import timeline images
 import laptopImage from "@/assets/timeline-laptop.jpg";
@@ -202,6 +204,7 @@ export const SwissverseTimeline = () => {
   const [timelineData, setTimelineData] = useState<TimelineYear[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const { isAdmin } = useAdminStatus();
 
   useEffect(() => {
     fetchTimelineData();
@@ -254,6 +257,19 @@ export const SwissverseTimeline = () => {
 
   const getIconComponent = (iconName: string) => {
     return iconMap[iconName] || Calendar;
+  };
+
+  const handleImageUpdate = (momentId: string, newImageUrl: string | null) => {
+    setTimelineData(prevData => 
+      prevData.map(yearData => ({
+        ...yearData,
+        moments: yearData.moments.map(moment => 
+          moment.id === momentId 
+            ? { ...moment, image_url: newImageUrl }
+            : moment
+        )
+      }))
+    );
   };
 
   if (isLoading) {
@@ -371,7 +387,16 @@ export const SwissverseTimeline = () => {
                            ? "mr-auto ml-0" 
                            : "ml-auto mr-0"
                        }`}>
-                        <Card className="card-glow overflow-hidden animate-fade-in">
+                        <Card className="card-glow overflow-hidden animate-fade-in group relative">
+                          {/* Admin Image Editor */}
+                          {isAdmin && (
+                            <TimelineImageEditor
+                              momentId={moment.id}
+                              currentImageUrl={moment.image_url || undefined}
+                              onImageUpdate={(newImageUrl) => handleImageUpdate(moment.id, newImageUrl)}
+                            />
+                          )}
+                          
                           {/* Optional Image - only show if image exists */}
                           {moment.image_url && (
                             <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
