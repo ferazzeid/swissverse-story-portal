@@ -2,27 +2,32 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pencil, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface InlineTextEditorProps {
-  momentId: string;
-  field: 'title' | 'content' | 'highlight' | 'month';
+interface ResourceInlineEditorProps {
+  resourceId: string;
+  field: 'title' | 'description' | 'category' | 'link_url';
   currentValue: string;
   onUpdate: (field: string, newValue: string) => void;
   className?: string;
   multiline?: boolean;
+  selectOptions?: string[];
 }
 
-export const InlineTextEditor = ({ 
-  momentId, 
+const CATEGORY_OPTIONS = ['development', 'assets', 'community', 'docs', 'learning', 'templates'];
+
+export const ResourceInlineEditor = ({ 
+  resourceId, 
   field, 
   currentValue, 
   onUpdate, 
   className = '',
-  multiline = false 
-}: InlineTextEditorProps) => {
+  multiline = false,
+  selectOptions 
+}: ResourceInlineEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(currentValue);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,9 +52,9 @@ export const InlineTextEditor = ({
     setIsLoading(true);
     try {
       const { error } = await supabase
-        .from('timeline_content')
+        .from('resources')
         .update({ [field]: value.trim() })
-        .eq('id', momentId);
+        .eq('id', resourceId);
 
       if (error) throw error;
 
@@ -67,7 +72,7 @@ export const InlineTextEditor = ({
         title: "Error",
         description: `Failed to update ${field}`
       });
-      setValue(currentValue); // Reset to original value
+      setValue(currentValue);
     } finally {
       setIsLoading(false);
     }
@@ -93,9 +98,9 @@ export const InlineTextEditor = ({
   const getFieldColor = () => {
     switch (field) {
       case 'title': return 'text-blue-500 hover:text-blue-600';
-      case 'content': return 'text-green-500 hover:text-green-600';
-      case 'highlight': return 'text-purple-500 hover:text-purple-600';
-      case 'month': return 'text-orange-500 hover:text-orange-600';
+      case 'description': return 'text-green-500 hover:text-green-600';
+      case 'category': return 'text-purple-500 hover:text-purple-600';
+      case 'link_url': return 'text-orange-500 hover:text-orange-600';
       default: return 'text-muted-foreground hover:text-foreground';
     }
   };
@@ -121,7 +126,20 @@ export const InlineTextEditor = ({
 
   return (
     <div className="relative">
-      {multiline ? (
+      {field === 'category' ? (
+        <Select value={value} onValueChange={setValue} disabled={isLoading}>
+          <SelectTrigger className={className}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : multiline ? (
         <Textarea
           ref={inputRef as React.RefObject<HTMLTextAreaElement>}
           value={value}
@@ -138,6 +156,7 @@ export const InlineTextEditor = ({
           onKeyDown={handleKeyDown}
           className={className}
           disabled={isLoading}
+          placeholder={field === 'link_url' ? 'https://...' : ''}
         />
       )}
       
