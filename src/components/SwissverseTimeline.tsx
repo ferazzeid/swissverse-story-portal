@@ -5,6 +5,9 @@ import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { TimelineImageEditor } from "./timeline/TimelineImageEditor";
+import { InsertPointIndicator } from "./timeline/InsertPointIndicator";
+import { InlineTextEditor } from "./timeline/InlineTextEditor";
+import { IconSelector } from "./timeline/IconSelector";
 
 // Import timeline images
 import laptopImage from "@/assets/timeline-laptop.jpg";
@@ -272,6 +275,34 @@ export const SwissverseTimeline = () => {
     );
   };
 
+  const handleFieldUpdate = (momentId: string, field: string, newValue: string) => {
+    setTimelineData(prevData => 
+      prevData.map(yearData => ({
+        ...yearData,
+        moments: yearData.moments.map(moment => 
+          moment.id === momentId 
+            ? { ...moment, [field]: newValue }
+            : moment
+        )
+      }))
+    );
+  };
+
+  const calculateInsertOrder = (yearMoments: TimelineMoment[], afterIndex: number): number => {
+    if (afterIndex === -1) {
+      // Insert at beginning
+      return yearMoments.length > 0 ? yearMoments[0].display_order - 1 : 1;
+    } else if (afterIndex === yearMoments.length - 1) {
+      // Insert at end
+      return yearMoments[afterIndex].display_order + 1;
+    } else {
+      // Insert between two moments
+      const currentOrder = yearMoments[afterIndex].display_order;
+      const nextOrder = yearMoments[afterIndex + 1].display_order;
+      return currentOrder + (nextOrder - currentOrder) / 2;
+    }
+  };
+
   if (isLoading) {
     return (
       <section className="py-20 px-4 max-w-6xl mx-auto">
@@ -372,113 +403,196 @@ export const SwissverseTimeline = () => {
                 </div>
               </div>
 
+              {/* Admin insert point at beginning of year */}
+              {isAdmin && (
+                <InsertPointIndicator
+                  year={yearData.year}
+                  displayOrder={calculateInsertOrder(yearData.moments, -1)}
+                  onMomentAdded={fetchTimelineData}
+                />
+              )}
+
               {/* Year Moments */}
               <div className="space-y-16">
                 {yearData.moments.map((moment, momentIndex) => {
                   const IconComponent = getIconComponent(moment.icon_name);
                   return (
-                    <div
-                      key={moment.id}
-                      className="relative"
-                    >
-                      {/* Content Card with proper left/right positioning */}
-                       <div className={`relative w-full max-w-lg ${
-                         momentIndex % 2 === 0 
-                           ? "mr-auto ml-0" 
-                           : "ml-auto mr-0"
-                       }`}>
-                        <Card className="card-glow overflow-hidden animate-fade-in group relative">
-                          {/* Admin Image Editor */}
-                          {isAdmin && (
-                            <TimelineImageEditor
-                              momentId={moment.id}
-                              currentImageUrl={moment.image_url || undefined}
-                              onImageUpdate={(newImageUrl) => handleImageUpdate(moment.id, newImageUrl)}
-                            />
-                          )}
-                          
-                          {/* Optional Image - only show if image exists */}
-                          {moment.image_url && (
-                            <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
-                              <div className="relative h-48 overflow-hidden">
-                                <img
-                                  src={moment.image_url}
-                                  alt={moment.title}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                  onError={(e) => {
-                                    // Replace with placeholder if image fails to load
-                                    e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=192&fit=crop";
-                                  }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                                <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
-                                  <div className="text-sm font-medium text-white">{moment.month}</div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          
-                          <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
-                            <div className="flex items-start gap-4 mb-4">
-                              <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} shadow-lg border-2 border-white/30 animate-scale-in backdrop-blur-sm`} style={{backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                                <IconComponent size={24} className="text-white drop-shadow-sm" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <h4 className="text-xl font-bold">{moment.title}</h4>
-                                  <Badge variant="outline" className="text-xs">
-                                    {moment.highlight}
-                                  </Badge>
-                                </div>
-                                {!moment.image_url && (
-                                  <p className="text-sm text-muted-foreground mb-2">{moment.month}</p>
-                                )}
-                              </div>
-                            </div>
-                            <p className="text-muted-foreground leading-relaxed mb-4">
-                              {moment.content}
-                            </p>
+                    <div key={`moment-${moment.id}`}>
+                      <div className="relative">
+                        {/* Content Card with proper left/right positioning */}
+                         <div className={`relative w-full max-w-lg ${
+                           momentIndex % 2 === 0 
+                             ? "mr-auto ml-0" 
+                             : "ml-auto mr-0"
+                         }`}>
+                          <Card className="card-glow overflow-hidden animate-fade-in group relative">
+                            {/* Admin Image Editor */}
+                            {isAdmin && (
+                              <TimelineImageEditor
+                                momentId={moment.id}
+                                currentImageUrl={moment.image_url || undefined}
+                                onImageUpdate={(newImageUrl) => handleImageUpdate(moment.id, newImageUrl)}
+                              />
+                            )}
                             
-                            {/* Story link if available */}
-                            {moment.has_story && moment.story_slug && (
-                              <div className="pt-4 border-t border-border/50">
-                                <Link
-                                  to={`/story/${moment.story_slug}`}
-                                  state={{ backgroundLocation: location }}
-                                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
-                                >
-                                  <BookOpen size={16} />
-                                  Read the full story
-                                  <ArrowRight size={14} />
-                                </Link>
+                            {/* Optional Image - only show if image exists */}
+                            {moment.image_url && (
+                              <div className="relative -m-6 mb-0 mx-[-1.5rem] mt-[-1.5rem]">
+                                <div className="relative h-48 overflow-hidden">
+                                  <img
+                                    src={moment.image_url}
+                                    alt={moment.title}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                    onError={(e) => {
+                                      // Replace with placeholder if image fails to load
+                                      e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=192&fit=crop";
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                                  <div className="absolute bottom-3 left-6 px-3 py-1 bg-background/80 backdrop-blur-sm rounded">
+                                    <div className="text-sm font-medium text-white">
+                                       {isAdmin ? (
+                                         <InlineTextEditor
+                                           momentId={moment.id}
+                                           field="month"
+                                           currentValue={moment.month}
+                                           onUpdate={(field, newValue) => handleFieldUpdate(moment.id, field, newValue)}
+                                           className="text-white bg-transparent border-none p-0 h-auto text-sm font-medium"
+                                         />
+                                       ) : (
+                                         moment.month
+                                       )}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             )}
-                          </div>
-                        </Card>
-
-                        {/* Timeline Connector - Hidden on mobile, visible on desktop */}
-                        <div className={`hidden md:block absolute top-8 z-20 ${
-                          momentIndex % 2 === 0 
-                            ? "-right-6" 
-                            : "-left-6"
-                        }`}>
-                          <div className="flex items-center">
-                            {/* Connector line to center */}
-                            <div className={`h-1 bg-white/60 shadow-md ${
-                              momentIndex % 2 === 0
-                                ? "w-6 md:order-1 order-2" 
-                                : "w-6 md:order-2 order-1"
-                            }`} />
                             
-                            {/* Center dot with gradient */}
-                            <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
-                              momentIndex % 2 === 0 
-                                ? "md:order-2 order-1" 
-                                : "md:order-1 order-2"
-                            }`} />
+                            <div className={`p-6 ${moment.image_url ? 'pt-4' : ''}`}>
+                              <div className="flex items-start gap-4 mb-4">
+                                <div className={`p-3 rounded-full bg-gradient-to-br ${moment.gradient_class} shadow-lg border-2 border-white/30 animate-scale-in backdrop-blur-sm relative`} style={{backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                                  {isAdmin ? (
+                                    <IconSelector
+                                      momentId={moment.id}
+                                      currentIcon={moment.icon_name}
+                                      onUpdate={(newIcon) => handleFieldUpdate(moment.id, 'icon_name', newIcon)}
+                                    />
+                                  ) : (
+                                    <IconComponent size={24} className="text-white drop-shadow-sm" />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="text-xl font-bold">
+                                       {isAdmin ? (
+                                         <InlineTextEditor
+                                           momentId={moment.id}
+                                           field="title"
+                                           currentValue={moment.title}
+                                           onUpdate={(field, newValue) => handleFieldUpdate(moment.id, field, newValue)}
+                                           className="text-xl font-bold bg-transparent border-none p-0 h-auto"
+                                         />
+                                       ) : (
+                                         moment.title
+                                       )}
+                                    </h4>
+                                    <Badge variant="outline" className="text-xs">
+                                       {isAdmin ? (
+                                         <InlineTextEditor
+                                           momentId={moment.id}
+                                           field="highlight"
+                                           currentValue={moment.highlight}
+                                           onUpdate={(field, newValue) => handleFieldUpdate(moment.id, field, newValue)}
+                                           className="text-xs bg-transparent border-none p-0 h-auto"
+                                         />
+                                       ) : (
+                                         moment.highlight
+                                       )}
+                                    </Badge>
+                                  </div>
+                                  {!moment.image_url && (
+                                    <p className="text-sm text-muted-foreground mb-2">
+                                       {isAdmin ? (
+                                         <InlineTextEditor
+                                           momentId={moment.id}
+                                           field="month"
+                                           currentValue={moment.month}
+                                           onUpdate={(field, newValue) => handleFieldUpdate(moment.id, field, newValue)}
+                                           className="text-sm bg-transparent border-none p-0 h-auto"
+                                         />
+                                       ) : (
+                                         moment.month
+                                       )}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-muted-foreground leading-relaxed mb-4">
+                                 {isAdmin ? (
+                                   <InlineTextEditor
+                                     momentId={moment.id}
+                                     field="content"
+                                     currentValue={moment.content}
+                                     onUpdate={(field, newValue) => handleFieldUpdate(moment.id, field, newValue)}
+                                     multiline={true}
+                                     className="text-muted-foreground leading-relaxed bg-transparent border-none p-0"
+                                   />
+                                 ) : (
+                                   <p>{moment.content}</p>
+                                 )}
+                              </div>
+                              
+                              {/* Story link if available */}
+                              {moment.has_story && moment.story_slug && (
+                                <div className="pt-4 border-t border-border/50">
+                                  <Link
+                                    to={`/story/${moment.story_slug}`}
+                                    state={{ backgroundLocation: location }}
+                                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+                                  >
+                                    <BookOpen size={16} />
+                                    Read the full story
+                                    <ArrowRight size={14} />
+                                  </Link>
+                                </div>
+                              )}
+                            </div>
+                          </Card>
+
+                          {/* Timeline Connector - Hidden on mobile, visible on desktop */}
+                          <div className={`hidden md:block absolute top-8 z-20 ${
+                            momentIndex % 2 === 0 
+                              ? "-right-6" 
+                              : "-left-6"
+                          }`}>
+                            <div className="flex items-center">
+                              {/* Connector line to center */}
+                              <div className={`h-1 bg-white/60 shadow-md ${
+                                momentIndex % 2 === 0
+                                  ? "w-6 md:order-1 order-2" 
+                                  : "w-6 md:order-2 order-1"
+                              }`} />
+                              
+                              {/* Center dot with gradient */}
+                              <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${moment.gradient_class} border border-white/60 shadow-sm ${
+                                momentIndex % 2 === 0 
+                                  ? "md:order-2 order-1" 
+                                  : "md:order-1 order-2"
+                              }`} />
+                            </div>
                           </div>
                         </div>
                       </div>
+
+                      {/* Admin insert point after each moment */}
+                      {isAdmin && (
+                        <InsertPointIndicator
+                          year={yearData.year}
+                          afterMomentId={moment.id}
+                          displayOrder={calculateInsertOrder(yearData.moments, momentIndex)}
+                          onMomentAdded={fetchTimelineData}
+                        />
+                      )}
                     </div>
                   );
                 })}
