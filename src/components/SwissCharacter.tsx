@@ -133,26 +133,25 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
       // Slow clockwise rotation from ~240 degrees
       vrm.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.15);
 
-      if (!idleReady) {
-        // Fallback micro idle when external idle is not available
-        const breathingIntensity = Math.sin(time * 1.5) * 0.08;
-        const breathingScale = 1 + Math.sin(time * 1.5) * 0.02;
-        group.position.y = breathingIntensity;
-        group.scale.setScalar(breathingScale);
+      // Always apply subtle micro idle baseline
+      const breathingIntensity = Math.sin(time * 1.5) * 0.08;
+      const breathingScale = 1 + Math.sin(time * 1.5) * 0.02;
+      group.position.y = breathingIntensity;
+      group.scale.setScalar(breathingScale);
 
-        const weightShift = Math.sin(time * 0.4) * 0.015;
-        group.rotation.z = weightShift;
+      const weightShift = Math.sin(time * 0.4) * 0.015;
+      group.rotation.z = weightShift;
 
-        if (vrm.humanoid) {
-          const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-          if (head) {
-            head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
-            head.rotation.x = Math.sin(time * 0.7) * 0.015;
-          }
+      if (vrm.humanoid) {
+        const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+        if (head) {
+          head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
+          head.rotation.x = Math.sin(time * 0.7) * 0.015;
         }
-      } else if (idleReady && idleSourceRef.current) {
-        // Retarget pose from the hidden source skeleton to the VRM
-        // Cast to any to satisfy TS since retarget's types aren't bundled
+      }
+
+      // If external idle animation is present, retarget its pose onto the VRM each frame
+      if (idleReady && idleSourceRef.current) {
         (SkeletonUtils as any).retarget(
           vrm.scene as unknown as THREE.Object3D,
           idleSourceRef.current as THREE.Object3D,
