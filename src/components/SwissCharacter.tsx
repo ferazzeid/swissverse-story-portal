@@ -5,13 +5,25 @@ import { VRM, VRMLoaderPlugin, VRMHumanBoneName } from '@pixiv/three-vrm';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-const SwissVRM = () => {
+const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
   const vrmRef = useRef<VRM | null>(null);
   const groupRef = useRef<THREE.Group>(null);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const [vrm, setVrm] = useState<VRM | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    // Respect user motion preferences
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setPrefersReduced(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const isPaused = paused || prefersReduced;
 
   useEffect(() => {
     const loadVRMAndAnimation = async () => {
@@ -33,7 +45,6 @@ const SwissVRM = () => {
           vrm.scene.position.set(-4, -4.5, 0);
           vrm.scene.rotation.y = -Math.PI * 2/3;
           
-          // Simple pose fix without extensive logging
           if (vrm.humanoid) {
             const leftUpperArm = vrm.humanoid.getNormalizedBoneNode(VRMHumanBoneName.LeftUpperArm);
             const rightUpperArm = vrm.humanoid.getNormalizedBoneNode(VRMHumanBoneName.RightUpperArm);
@@ -54,37 +65,30 @@ const SwissVRM = () => {
       }
     };
 
-
     loadVRMAndAnimation();
   }, []);
 
   useFrame((state, delta) => {
+    if (isPaused) return; // Skip all animation when paused/reduced motion
     if (vrmRef.current && groupRef.current) {
       const time = state.clock.elapsedTime;
       
-      // Removed intensive periodic pose checking to improve performance
-      
-      // Force simple animations - ignore mixer completely 
-      // 360-degree slow clockwise rotation animation with breathing
-      if (vrmRef.current) {
-        vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2); // Clockwise rotation from 240 degrees
-      }
+      // Slow clockwise rotation from 240 degrees
+      vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2);
       
       // Breathing/pulsating animation - scale and position
-      const breathingIntensity = Math.sin(time * 1.5) * 0.08; // Stronger breathing
-      const breathingScale = 1 + Math.sin(time * 1.5) * 0.02; // Subtle scale pulsing
+      const breathingIntensity = Math.sin(time * 1.5) * 0.08;
+      const breathingScale = 1 + Math.sin(time * 1.5) * 0.02;
       
-      if (groupRef.current) {
-        groupRef.current.position.y = breathingIntensity; // Up and down movement
-        groupRef.current.scale.setScalar(breathingScale); // Subtle size pulsing
-        
-        // Weight shifting from leg to leg (slower cycle)
-        const weightShift = Math.sin(time * 0.4) * 0.015;
-        groupRef.current.rotation.z = weightShift;
-      }
+      groupRef.current.position.y = breathingIntensity;
+      groupRef.current.scale.setScalar(breathingScale);
       
-      // Add some natural head movement without complex animations
-      if (vrmRef.current && vrmRef.current.humanoid) {
+      // Weight shifting from leg to leg (slower cycle)
+      const weightShift = Math.sin(time * 0.4) * 0.015;
+      groupRef.current.rotation.z = weightShift;
+      
+      // Natural head movement
+      if (vrmRef.current.humanoid) {
         const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
         if (head) {
           head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
@@ -92,7 +96,6 @@ const SwissVRM = () => {
         }
       }
       
-      // Update VRM (required for animations)
       vrmRef.current.update(delta);
     }
   });
@@ -130,7 +133,7 @@ const SwissVRM = () => {
   );
 };
 
-export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
+export const SwissCharacter = ({ isHero = false, paused = false }: { isHero?: boolean; paused?: boolean }) => {
   if (isHero) {
     return (
       <div 
@@ -140,7 +143,10 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
         {/* Position canvas to show avatar on left side - shift the whole canvas left */}
         <div className="absolute -left-32 top-0 w-1/2 h-full pointer-events-auto">
           <Canvas
-            camera={{ position: [0, 2, 12], fov: 45 }} // Camera looking straight ahead
+            camera={{ position: [0, 2, 12], fov: 45 }}
+            frameloop={paused ? 'never' : 'always'}
+            dpr={[1, 1.5]}
+            gl={{ powerPreference: 'high-performance', antialias: true }}
             style={{ 
               background: 'transparent', 
               width: '100%', 
@@ -157,7 +163,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
             />
             <pointLight position={[-3, 3, 3]} intensity={0.6} color="#9333ea" />
             <pointLight position={[3, 2, -2]} intensity={0.4} color="#06b6d4" />
-            <SwissVRM />
+            <SwissVRM paused={paused} />
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
@@ -165,7 +171,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
               maxDistance={16}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-4, 0, 0]} // Back to -4 to match avatar position
+              target={[-4, 0, 0]}
             />
           </Canvas>
         </div>
@@ -177,6 +183,9 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
     <div className="fixed bottom-4 right-4 w-48 h-48 z-10">
       <Canvas
         camera={{ position: [0, 0, 3], fov: 50 }}
+        frameloop={paused ? 'never' : 'always'}
+        dpr={[1, 1.5]}
+        gl={{ powerPreference: 'high-performance', antialias: true }}
         style={{ background: 'transparent' }}
       >
         <ambientLight intensity={0.6} />
@@ -185,7 +194,7 @@ export const SwissCharacter = ({ isHero = false }: { isHero?: boolean }) => {
           intensity={1}
           castShadow
         />
-        <SwissVRM />
+        <SwissVRM paused={paused} />
       </Canvas>
     </div>
   );
