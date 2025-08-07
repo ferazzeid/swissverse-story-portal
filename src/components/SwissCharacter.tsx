@@ -130,8 +130,7 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
     if (vrm && group) {
       const time = state.clock.elapsedTime;
 
-      // Slow clockwise rotation from ~240 degrees
-      vrm.scene.rotation.y = (-Math.PI / 8) + (time * 0.15);
+      // Rotation is handled by OrbitControls autoRotate for smooth camera orbit
 
       // Always apply subtle micro idle baseline
       const breathingIntensity = Math.sin(time * 1.5) * 0.08;
@@ -229,12 +228,14 @@ export const SwissCharacter = ({ isHero = false, paused = false }: { isHero?: bo
             <SwissVRM paused={paused} />
             <OrbitControls 
               enablePan={false}
-              enableZoom={true}
-              minDistance={8}
-              maxDistance={16}
+              enableZoom={false}
+              enableDamping
+              dampingFactor={0.05}
+              autoRotate
+              autoRotateSpeed={0.6}
               maxPolarAngle={Math.PI / 1.8}
               minPolarAngle={Math.PI / 4}
-              target={[-4, 0, 0]}
+              target={[-4, -4.5, 0]}
             />
           </Canvas>
         </div>
