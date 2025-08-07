@@ -275,28 +275,3 @@ All colors MUST be HSL.
     @apply mb-2;
   }
 }
-
-/* Accessibility: Skip link and reduced motion */
-@layer base {
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
-    }
-  }
-}
-
-@layer components {
-  .skip-link {
-    position: absolute;
-    left: -999px;
-    top: -999px;
-  }
-  .skip-link:focus {
-    position: fixed;
-    left: 1rem;
-    top: 1rem;
-    @apply z-50 px-4 py-2 rounded-md bg-background text-foreground ring-2 ring-ring ring-offset-2 ring-offset-background shadow;
-  }
-}

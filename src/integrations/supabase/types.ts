@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      app_events: {
-        Row: {
-          created_at: string
-          event_type: string
-          id: string
-          metadata: Json
-          path: string | null
-          session_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          event_type: string
-          id?: string
-          metadata?: Json
-          path?: string | null
-          session_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          event_type?: string
-          id?: string
-          metadata?: Json
-          path?: string | null
-          session_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       configurable_links: {
         Row: {
           button_size: string

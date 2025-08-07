@@ -42,7 +42,6 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <a href="#main" className="skip-link">Skip to content</a>
     <TooltipProvider>
       <Toaster />
       <Sonner />
