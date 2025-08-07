@@ -50,7 +50,7 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
         if (vrm) {
           vrm.scene.scale.setScalar(5);
           vrm.scene.position.set(-4, -4.5, 0);
-          vrm.scene.rotation.y = -Math.PI * 2/3;
+          vrm.scene.rotation.y = -Math.PI / 8;
 
           // Apply a relaxed idle pose (replaces temporary T-pose arm override)
           applyRelaxedPose(vrm);
@@ -117,7 +117,7 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
   }, [vrm]);
 
   useFrame((state, delta) => {
-    if (isPaused) return; // Skip all animation when paused/reduced motion
+    // Reduced-motion detected or paused: we still keep gentle rotation active
 
     // Update source mixer if external idle animation is present
     if (idleMixerRef.current) {
@@ -131,7 +131,7 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
       const time = state.clock.elapsedTime;
 
       // Slow clockwise rotation from ~240 degrees
-      vrm.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.15);
+      vrm.scene.rotation.y = (-Math.PI / 8) + (time * 0.15);
 
       // Always apply subtle micro idle baseline
       const breathingIntensity = Math.sin(time * 1.5) * 0.08;
