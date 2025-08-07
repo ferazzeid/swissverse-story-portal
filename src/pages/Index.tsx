@@ -51,22 +51,22 @@ const Index = () => {
         </Suspense>
       </div>
 
-      <main>
-        <Suspense fallback={<section className="min-h-32 animate-fade-in" aria-busy="true" />}>
+      <main id="main">
+        <Suspense fallback={<section className="min-h-32" aria-busy="true" />}>
           <SwissverseTimelineLazy />
         </Suspense>
-        <Suspense fallback={<section className="min-h-32 animate-fade-in" aria-busy="true" />}>
+        <Suspense fallback={<section className="min-h-32" aria-busy="true" />}>
           <GallerySliderLazy />
         </Suspense>
-        <Suspense fallback={<section className="min-h-32 animate-fade-in" aria-busy="true" />}>
+        <Suspense fallback={<section className="min-h-32" aria-busy="true" />}>
           <YouTubeSectionLazy />
         </Suspense>
-        <Suspense fallback={<section className="min-h-32 animate-fade-in" aria-busy="true" />}>
+        <Suspense fallback={<section className="min-h-32" aria-busy="true" />}>
           <ResourcesGridLazy />
         </Suspense>
       </main>
 
-      <Suspense fallback={<footer className="min-h-16 animate-fade-in" aria-busy="true" />}>
+      <Suspense fallback={<footer className="min-h-16" aria-busy="true" />}>
         <FooterLazy />
       </Suspense>
     </div>
