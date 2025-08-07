@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { HeroSection } from "@/components/HeroSection";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
+import { logEvent } from "@/integrations/supabase/analytics";
 
 // Lazy-load heavy sections for faster first paint
 const SwissCharacterLazy = lazy(() => import("@/components/SwissCharacter").then(m => ({ default: m.SwissCharacter })));
@@ -25,6 +26,9 @@ const Index = () => {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  useEffect(() => {
+    logEvent("page_view");
+  }, []);
   return (
     <div className="min-h-screen relative">
       <SEOHead pageName="home" />
@@ -37,7 +41,13 @@ const Index = () => {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setPaused3D(p => !p)}
+            onClick={() => {
+              setPaused3D((p) => {
+                const next = !p;
+                logEvent("3d_toggle", { paused: next });
+                return next;
+              });
+            }}
             aria-pressed={paused3D}
             aria-label={paused3D ? "Enable 3D animations" : "Pause 3D animations"}
             className="hover-scale"

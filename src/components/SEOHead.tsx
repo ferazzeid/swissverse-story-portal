@@ -7,6 +7,27 @@ interface SEOHeadProps {
 
 export const SEOHead = ({ pageName }: SEOHeadProps) => {
   useEffect(() => {
+    const ensureMeta = (selector: string, attrs: Record<string, string>) => {
+      let el = document.head.querySelector(selector) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        Object.entries(attrs).forEach(([k, v]) => el!.setAttribute(k, v));
+        document.head.appendChild(el!);
+      }
+      return el!;
+    };
+
+    const ensureLink = (rel: string, href: string) => {
+      let el = document.head.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
+      if (!el) {
+        el = document.createElement('link');
+        el.rel = rel;
+        document.head.appendChild(el);
+      }
+      el.href = href;
+      return el;
+    };
+
     const updateSEO = async () => {
       try {
         const { data, error } = await supabase
@@ -18,38 +39,58 @@ export const SEOHead = ({ pageName }: SEOHeadProps) => {
 
         if (error) throw error;
 
-        if (data) {
-          if (data.meta_title) {
-            document.title = data.meta_title;
-          }
-          
-          if (data.meta_description) {
-            // Update or create meta description
-            let metaDesc = document.querySelector('meta[name="description"]');
-            if (metaDesc) {
-              metaDesc.setAttribute('content', data.meta_description);
-            } else {
-              metaDesc = document.createElement('meta');
-              metaDesc.setAttribute('name', 'description');
-              metaDesc.setAttribute('content', data.meta_description);
-              document.head.appendChild(metaDesc);
-            }
+        const title = data?.meta_title || document.title || 'SWISSVERSE';
+        const description = data?.meta_description || 'SWISSVERSE: Web3, NFT, AI and Metaverse.';
+        const url = window.location.href;
 
-            // Update Open Graph description
-            let ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) {
-              ogDesc.setAttribute('content', data.meta_description);
-            }
+        // Title
+        document.title = title;
 
-            // Update Open Graph title
-            if (data.meta_title) {
-              let ogTitle = document.querySelector('meta[property="og:title"]');
-              if (ogTitle) {
-                ogTitle.setAttribute('content', data.meta_title);
-              }
-            }
+        // Meta description
+        const descMeta = ensureMeta('meta[name="description"]', { name: 'description', content: description });
+        descMeta.setAttribute('content', description);
+
+        // Canonical
+        ensureLink('canonical', url);
+
+        // Open Graph
+        const ogTitle = ensureMeta('meta[property="og:title"]', { property: 'og:title', content: title });
+        ogTitle.setAttribute('content', title);
+        const ogDesc = ensureMeta('meta[property="og:description"]', { property: 'og:description', content: description });
+        ogDesc.setAttribute('content', description);
+        const ogType = ensureMeta('meta[property="og:type"]', { property: 'og:type', content: 'website' });
+        ogType.setAttribute('content', 'website');
+        const ogUrl = ensureMeta('meta[property="og:url"]', { property: 'og:url', content: url });
+        ogUrl.setAttribute('content', url);
+
+        // Twitter
+        const twCard = ensureMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+        twCard.setAttribute('content', 'summary_large_image');
+        const twTitle = ensureMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
+        twTitle.setAttribute('content', title);
+        const twDesc = ensureMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
+        twDesc.setAttribute('content', description);
+
+        // Basic JSON-LD for WebSite
+        const ldJson = {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: title,
+          url,
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${window.location.origin}/?q={search_term_string}`,
+            'query-input': 'required name=search_term_string'
           }
+        };
+        let script = document.getElementById('ld-website') as HTMLScriptElement | null;
+        if (!script) {
+          script = document.createElement('script') as HTMLScriptElement;
+          script.type = 'application/ld+json';
+          script.id = 'ld-website';
+          document.head.appendChild(script);
         }
+        script.textContent = JSON.stringify(ldJson);
       } catch (error) {
         console.error('Error loading SEO metadata:', error);
       }

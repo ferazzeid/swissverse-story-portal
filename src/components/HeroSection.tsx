@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, Sparkles, Globe, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { icons } from 'lucide-react';
+import { logEvent } from "@/integrations/supabase/analytics";
 
 interface HomePageContent {
   section_key: string;
@@ -203,11 +204,10 @@ export const HeroSection = () => {
                 size={link.button_size as any} 
                 className="group"
                 onClick={() => {
+                  logEvent("cta_click", { link_key: link.link_key, url: link.url, title: link.title });
                   if (link.url.startsWith('/')) {
-                    // Internal link - use navigate
                     window.location.href = link.url;
                   } else {
-                    // External link - open in new tab
                     window.open(link.url, '_blank');
                   }
                 }}
