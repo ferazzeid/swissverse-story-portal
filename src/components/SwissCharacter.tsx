@@ -4,16 +4,22 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VRM, VRMLoaderPlugin, VRMHumanBoneName } from '@pixiv/three-vrm';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { applyRelaxedPose } from '../lib/vrmPose';
 
 const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
   const vrmRef = useRef<VRM | null>(null);
   const groupRef = useRef<THREE.Group>(null);
-  const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const [vrm, setVrm] = useState<VRM | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [prefersReduced, setPrefersReduced] = useState(false);
+
+  // External idle animation retargeting
+  const idleSourceRef = useRef<THREE.Object3D | null>(null);
+  const idleMixerRef = useRef<THREE.AnimationMixer | null>(null);
+  const [idleReady, setIdleReady] = useState(false);
+
 
   useEffect(() => {
     // Respect user motion preferences
@@ -62,35 +68,99 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
     loadVRMAndAnimation();
   }, []);
 
+  // Load and play external idle animation (GLB), then retarget to VRM each frame
+  useEffect(() => {
+    if (!vrmRef.current || !groupRef.current) return;
+
+    let canceled = false;
+    const loader = new GLTFLoader();
+    const idleUrl = 'https://raw.githubusercontent.com/ferazzeid/vrm/main/idle.glb';
+
+    loader.load(
+      idleUrl,
+      (gltf) => {
+        if (canceled) return;
+        const source = gltf.scene;
+        source.visible = false; // keep hidden; we only use its skeleton pose
+        idleSourceRef.current = source;
+        groupRef.current?.add(source);
+
+        const mixer = new THREE.AnimationMixer(source);
+        idleMixerRef.current = mixer;
+        const clip = gltf.animations?.[0];
+        if (clip) {
+          const action = mixer.clipAction(clip);
+          action.play();
+          setIdleReady(true);
+        }
+      },
+      undefined,
+      () => {
+        // ignore errors; fallback to static relaxed pose
+      }
+    );
+
+    return () => {
+      canceled = true;
+      if (idleMixerRef.current) {
+        idleMixerRef.current.stopAllAction();
+        // @ts-ignore - uncacheRoot may not be typed
+        idleMixerRef.current.uncacheRoot?.(idleSourceRef.current as any);
+        idleMixerRef.current = null;
+      }
+      if (idleSourceRef.current && groupRef.current) {
+        groupRef.current.remove(idleSourceRef.current);
+        idleSourceRef.current = null;
+      }
+      setIdleReady(false);
+    };
+  }, [vrm]);
+
   useFrame((state, delta) => {
     if (isPaused) return; // Skip all animation when paused/reduced motion
-    if (vrmRef.current && groupRef.current) {
+
+    // Update source mixer if external idle animation is present
+    if (idleMixerRef.current) {
+      idleMixerRef.current.update(delta);
+    }
+
+    const vrm = vrmRef.current;
+    const group = groupRef.current;
+
+    if (vrm && group) {
       const time = state.clock.elapsedTime;
-      
-      // Slow clockwise rotation from 240 degrees
-      vrmRef.current.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.2);
-      
-      // Breathing/pulsating animation - scale and position
-      const breathingIntensity = Math.sin(time * 1.5) * 0.08;
-      const breathingScale = 1 + Math.sin(time * 1.5) * 0.02;
-      
-      groupRef.current.position.y = breathingIntensity;
-      groupRef.current.scale.setScalar(breathingScale);
-      
-      // Weight shifting from leg to leg (slower cycle)
-      const weightShift = Math.sin(time * 0.4) * 0.015;
-      groupRef.current.rotation.z = weightShift;
-      
-      // Natural head movement
-      if (vrmRef.current.humanoid) {
-        const head = vrmRef.current.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
-        if (head) {
-          head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
-          head.rotation.x = Math.sin(time * 0.7) * 0.015;
+
+      // Slow clockwise rotation from ~240 degrees
+      vrm.scene.rotation.y = (-Math.PI * 2/3) + (time * 0.15);
+
+      if (!idleReady) {
+        // Fallback micro idle when external idle is not available
+        const breathingIntensity = Math.sin(time * 1.5) * 0.08;
+        const breathingScale = 1 + Math.sin(time * 1.5) * 0.02;
+        group.position.y = breathingIntensity;
+        group.scale.setScalar(breathingScale);
+
+        const weightShift = Math.sin(time * 0.4) * 0.015;
+        group.rotation.z = weightShift;
+
+        if (vrm.humanoid) {
+          const head = vrm.humanoid.getRawBoneNode(VRMHumanBoneName.Head);
+          if (head) {
+            head.rotation.y = 0.1 + Math.sin(time * 0.3) * 0.05;
+            head.rotation.x = Math.sin(time * 0.7) * 0.015;
+          }
         }
+      } else if (idleReady && idleSourceRef.current) {
+        // Retarget pose from the hidden source skeleton to the VRM
+        // Cast to any to satisfy TS since retarget's types aren't bundled
+        (SkeletonUtils as any).retarget(
+          vrm.scene as unknown as THREE.Object3D,
+          idleSourceRef.current as THREE.Object3D,
+          { preservePosition: true }
+        );
       }
-      
-      vrmRef.current.update(delta);
+
+      vrm.update(delta);
     }
   });
 
