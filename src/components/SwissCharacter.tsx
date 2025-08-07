@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VRM, VRMLoaderPlugin, VRMHumanBoneName } from '@pixiv/three-vrm';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import { applyRelaxedPose } from '../lib/vrmPose';
 
 const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
   const vrmRef = useRef<VRM | null>(null);
@@ -44,16 +45,9 @@ const SwissVRM = ({ paused = false }: { paused?: boolean }) => {
           vrm.scene.scale.setScalar(5);
           vrm.scene.position.set(-4, -4.5, 0);
           vrm.scene.rotation.y = -Math.PI * 2/3;
-          
-          if (vrm.humanoid) {
-            const leftUpperArm = vrm.humanoid.getNormalizedBoneNode(VRMHumanBoneName.LeftUpperArm);
-            const rightUpperArm = vrm.humanoid.getNormalizedBoneNode(VRMHumanBoneName.RightUpperArm);
-            
-            if (leftUpperArm && rightUpperArm) {
-              leftUpperArm.rotation.set(0.5, 0, 1.4);
-              rightUpperArm.rotation.set(0.5, 0, -1.4);
-            }
-          }
+
+          // Apply a relaxed idle pose (replaces temporary T-pose arm override)
+          applyRelaxedPose(vrm);
           
           setVrm(vrm);
           vrmRef.current = vrm;
